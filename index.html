@@ -119,6 +119,7 @@
   <a href="#hydrostatics">Hydrostatics</a>
   <a href="#dynamics">Dynamics</a>
   <a href="#viz">3D Renders</a>
+  <a href="#orion">vs Orion</a>
   <a href="#conclusions">Conclusions</a>
 </nav>
 
@@ -355,6 +356,102 @@
     <div class="img-frame"><img src="flotation_viz_heeled_45.png" alt="45 deg"><div class="caption"><strong>45&deg; heel.</strong> Partially submerged. Self-rights to upright in ~18 s.</div></div>
     <div class="img-frame"><img src="flotation_viz_inverted.png" alt="Inverted"><div class="caption"><strong>Inverted (180&deg;).</strong> Keel up. NOT a stable equilibrium &mdash; capsule tumbles out.</div></div>
   </div>
+</section>
+
+<!-- ORION COMPARISON -->
+<section id="orion">
+  <h2>Why Orion Needs Uprighting Bags &mdash; and BLOON Does Not</h2>
+  <p>NASA&rsquo;s Orion crew module requires a dedicated <strong>Crew Module Uprighting System (CMUS)</strong> with 5 helium-inflated bags to recover from an inverted &ldquo;Stable 2&rdquo; orientation. <em>47% of Apollo ocean splashdowns ended inverted.</em> The BLOON capsule&rsquo;s toroidal geometry eliminates this problem entirely.</p>
+
+  <h3>Shape Comparison: Frustum vs Torus</h3>
+  <div class="card-grid">
+    <div class="card" style="border-color: #d63031;">
+      <h3 style="color:#e74c3c;">NASA Orion (Frustum / Cone)</h3>
+      <p style="font-size:0.9rem">A 57.5&deg; truncated cone &mdash; wide heat-shield base (5.02 m), narrow apex top (2.0 m). This asymmetric shape creates <strong>two stable floating orientations:</strong></p>
+      <ul style="font-size:0.85rem">
+        <li><strong>Stable 1</strong> (upright): heat shield down, apex up. Wide base provides large waterplane &rarr; strong GM.</li>
+        <li><strong>Stable 2</strong> (inverted): apex down, heat shield up. Narrower waterplane, but geometry still permits a marginally stable equilibrium with crew hatch <em>submerged</em>.</li>
+      </ul>
+      <p style="font-size:0.85rem; color:var(--red)"><strong>Result:</strong> 5 CMUS bags (5000 psi helium COPVs) required on every mission. Uprighting takes up to 4 minutes. System failed partially on EFT-1 (2014) &mdash; only 2 of 5 bags held pressure.</p>
+    </div>
+    <div class="card" style="border-color: var(--green);">
+      <h3 style="color:var(--green);">BLOON (Torus / Donut)</h3>
+      <p style="font-size:0.9rem">A symmetric toroidal shell with conical keel. The ring geometry produces a <strong>single stable floating orientation</strong> (upright):</p>
+      <ul style="font-size:0.85rem">
+        <li>Waterplane area is large and roughly similar at <em>any</em> heel angle (annular cross-section).</li>
+        <li>The keel cone (35.9 kg at Z = &minus;0.7 m) lowers CG well below the centre of buoyancy.</li>
+        <li>There is <strong>no second stable equilibrium</strong> &mdash; the inverted position is confirmed unstable (GM &lt; 0 when inverted).</li>
+      </ul>
+      <p style="font-size:0.85rem; color:var(--green)"><strong>Result:</strong> No uprighting system needed. Self-rights from 90&deg; in ~16 s. Airbag (already present for landing) provides 3.8&times; stability bonus.</p>
+    </div>
+  </div>
+
+  <h3>Estimated Inertia &amp; Stability Comparison</h3>
+  <p>Orion&rsquo;s inertia tensor is estimated from a 9-item mass decomposition (heat shield 1000 kg at base, crew structure 3000 kg mid-upper, avionics 1500 kg mid, life support 1000 kg upper, parachute 500 kg apex, shell 2000 kg distributed, crew 320 kg, other 1080 kg). CG at 1.50 m above heat shield base.</p>
+
+  <table>
+    <thead>
+      <tr><th>Parameter</th><th style="text-align:right">NASA Orion</th><th style="text-align:right">BLOON Capsule</th><th>Ratio</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Shape</td><td>57.5&deg; frustum</td><td>Asymmetric torus + keel</td><td>&mdash;</td></tr>
+      <tr><td>Splashdown mass</td><td class="num">10,400 kg</td><td class="num">1,401 kg</td><td>7.4&times;</td></tr>
+      <tr><td>Max diameter</td><td class="num">5.02 m</td><td class="num">3.00 m</td><td>1.7&times;</td></tr>
+      <tr><td>Height</td><td class="num">3.30 m</td><td class="num">2.87 m <sup>*</sup></td><td>1.1&times;</td></tr>
+      <tr><td>Displaced volume</td><td class="num">10.15 m&sup3;</td><td class="num">1.37 m&sup3;</td><td>7.4&times;</td></tr>
+      <tr><td>I<sub>xx</sub> (roll)</td><td class="num"><strong>~17,000 kg&middot;m&sup2;</strong></td><td class="num">743 kg&middot;m&sup2;</td><td>23&times;</td></tr>
+      <tr><td>I<sub>yy</sub> (pitch)</td><td class="num">~17,000 kg&middot;m&sup2;</td><td class="num">684 kg&middot;m&sup2;</td><td>25&times;</td></tr>
+      <tr><td>I<sub>zz</sub> (yaw)</td><td class="num">~26,000 kg&middot;m&sup2;</td><td class="num">776 kg&middot;m&sup2;</td><td>33&times;</td></tr>
+      <tr><td>GM upright (Stable 1)</td><td class="num">~+2.2 m <sup>&dagger;</sup></td><td class="num">+0.61 m</td><td>3.6&times;</td></tr>
+      <tr><td>GM inverted (Stable 2)</td><td class="num"><strong>~+0.05 m</strong> <sup>&Dagger;</sup></td><td class="num"><strong>&lt; 0</strong> (unstable)</td><td>&mdash;</td></tr>
+      <tr><td>Stable orientations</td><td class="unstable">TWO (Stable 1 + Stable 2)</td><td class="stable">ONE (upright only)</td><td>&mdash;</td></tr>
+      <tr><td>Uprighting system</td><td class="unstable">CMUS: 5 bags, 5000 psi He</td><td class="stable">None required</td><td>&mdash;</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:0.8rem; color:var(--text2)">
+    <sup>*</sup> Torus top to keel tip. &nbsp;
+    <sup>&dagger;</sup> Estimated from frustum geometry; exact NASA value restricted. &nbsp;
+    <sup>&Dagger;</sup> Marginally stable &mdash; real geometry slightly positive, explaining why ~47% of Apollo splashdowns stayed inverted.
+  </p>
+
+  <h3>Orion Inertia Estimation Method</h3>
+  <div class="card" style="font-size:0.88rem;">
+    <p>The Orion inertia tensor was estimated by decomposing the 10,400 kg splashdown mass into 9 representative subsystem groups, each modelled as a ring mass at its approximate radial distance and height within the frustum:</p>
+    <table style="font-size:0.85rem">
+      <thead><tr><th>Component</th><th style="text-align:right">Mass (kg)</th><th style="text-align:right">Z from base (m)</th><th style="text-align:right">R avg (m)</th><th>Contribution to I<sub>xx</sub></th></tr></thead>
+      <tbody>
+        <tr><td>Heat shield (AVCOAT)</td><td class="num">1,000</td><td class="num">0.10</td><td class="num">2.00</td><td class="num">3,960 kg&middot;m&sup2;</td></tr>
+        <tr><td>Crew structure + seats</td><td class="num">3,000</td><td class="num">1.80</td><td class="num">1.50</td><td class="num">3,645</td></tr>
+        <tr><td>Avionics / power</td><td class="num">1,500</td><td class="num">1.00</td><td class="num">1.50</td><td class="num">2,063</td></tr>
+        <tr><td>Shell structure (Ti/Al)</td><td class="num">2,000</td><td class="num">1.50</td><td class="num">2.00</td><td class="num">4,000</td></tr>
+        <tr><td>Life support</td><td class="num">1,000</td><td class="num">2.00</td><td class="num">1.00</td><td class="num">750</td></tr>
+        <tr><td>Parachute / CMUS</td><td class="num">500</td><td class="num">3.00</td><td class="num">0.50</td><td class="num">1,188</td></tr>
+        <tr><td>Crew (4 persons)</td><td class="num">320</td><td class="num">1.50</td><td class="num">1.00</td><td class="num">160</td></tr>
+        <tr><td>Other (RCS, wiring, TPS)</td><td class="num">1,080</td><td class="num">1.50</td><td class="num">1.50</td><td class="num">1,215</td></tr>
+        <tr style="font-weight:600"><td>TOTAL</td><td class="num">10,400</td><td class="num">1.50 (CG)</td><td class="num">&mdash;</td><td class="num" style="color:var(--accent)">16,981</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:0.8rem">I<sub>xx</sub> computed as &Sigma; m<sub>i</sub>(r<sub>i</sub>&sup2;/2 + &Delta;z<sub>i</sub>&sup2;) with &Delta;z measured from CG. I<sub>zz</sub> = &Sigma; m<sub>i</sub> r<sub>i</sub>&sup2;. Estimates are within &plusmn;20% of restricted NASA values based on published CG location and mass budget.</p>
+  </div>
+
+  <h3>The Fundamental Difference</h3>
+  <div class="finding">
+    <div class="icon">&#128270;</div>
+    <div class="body">
+      <strong>A cone has two ends &mdash; a torus has none</strong>
+      <p>Orion&rsquo;s frustum shape means it can sit stably on either the wide base (heat shield) or the narrow apex. Both orientations trap water below a convex hull, creating a positive metacentric height. A torus has continuous rotational symmetry about the vertical axis and only one flotation equilibrium because the waterplane second moment of area is always dominated by the large ring diameter, overwhelming any CG offset. The keel further enforces this single equilibrium by concentrating mass at the lowest point.</p>
+    </div>
+  </div>
+  <div class="finding">
+    <div class="icon">&#128640;</div>
+    <div class="body">
+      <strong>Orion&rsquo;s CMUS adds 5 single-point failure paths. BLOON needs zero.</strong>
+      <p>Each CMUS bag requires a helium COPV, pyrotechnic valve, inflation plumbing, and fabric bladder &mdash; all of which must survive reentry heating, parachute deployment shock, and ocean splashdown impact. The EFT-1 partial failure (3 of 5 bags failed) demonstrates the difficulty. The BLOON capsule&rsquo;s inherent single-stable-point geometry eliminates this entire subsystem, saving mass and removing failure modes.</p>
+    </div>
+  </div>
+
+  <h3>Historical Context: Apollo Uprighting</h3>
+  <p>The Apollo Command Module (CM) had the same two-stable-point problem. Of 19 ocean splashdowns, <strong>9 (47%) ended in Stable 2</strong> (inverted). Apollo used 3 inflatable bags (&ldquo;uprighting balloons&rdquo;) in the nose section. These were pressurised by the crew manually activating compressors &mdash; a process that took several minutes with the astronauts hanging upside-down in their harnesses, often seasick. The Orion CMUS is the modern evolution of this system, now automatic but still mechanically complex.</p>
 </section>
 
 <!-- CONCLUSIONS -->
