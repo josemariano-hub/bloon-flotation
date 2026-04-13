@@ -121,6 +121,7 @@
   <a href="#viz">3D Renders</a>
   <a href="#orion">vs Orion</a>
   <a href="#inverted">Inverted</a>
+  <a href="#sphere">Sphere</a>
   <a href="#redblue">Red/Blue</a>
   <a href="#conclusions">Conclusions</a>
 </nav>
@@ -541,6 +542,78 @@
       <tr><td><strong>All three combined</strong></td><td>Near-100% GZ positive from 0&deg;&ndash;180&deg;, directed righting from inverted in &lt; 15 s</td><td class="neutral">Medium total</td><td>32 kg</td></tr>
     </tbody>
   </table>
+</section>
+
+<!-- SELF-RIGHTING SPHERE -->
+<section id="sphere">
+  <h2>Solution: The Self-Righting Sphere</h2>
+  <p>An 80 cm diameter inflatable sphere mounted on the capsule roof. When inverted, the sphere is underwater and its buoyancy accelerates the departure from 180&deg;, providing enough kinetic energy to carry the capsule through the wrong-way GZ zones.</p>
+
+  <h3>The Problem (without sphere)</h3>
+  <div class="img-frame">
+    <video controls loop muted playsinline preload="metadata">
+      <source src="vid_tumble_180.mp4" type="video/mp4">
+    </video>
+    <div class="caption"><strong>Chaotic tumbling from 180&deg; inverted (no sphere).</strong> The capsule slowly drifts from inverted, gets a massive angular kick at 210&deg;, barrels through wrong-way zones at 90&deg;, overshoots 0&deg;, and oscillates violently for 30+ seconds before settling. Passengers would experience wild rocking and multiple full rotations.</div>
+  </div>
+
+  <h3>The Solution (with sphere)</h3>
+  <div class="img-frame">
+    <video controls loop muted playsinline preload="metadata">
+      <source src="vid_sphere_recovery.mp4" type="video/mp4">
+    </video>
+    <div class="caption"><strong>Directed recovery with 80 cm sphere (red).</strong> The sphere&rsquo;s 275 kgf of buoyancy accelerates the departure from inverted 2&ndash;3&times; faster. The capsule reaches the recovery zone sooner and with a more directed velocity, reducing the overshoot amplitude. Recovery to &plusmn;15&deg; in ~8 seconds.</div>
+  </div>
+
+  <h3>Sphere Sizing</h3>
+  <div class="card-grid">
+    <div class="stat-card"><div class="value">80 cm</div><div class="label">Sphere diameter</div></div>
+    <div class="stat-card"><div class="value">268 L</div><div class="label">Volume (0.268 m&sup3;)</div></div>
+    <div class="stat-card green"><div class="value">275 kgf</div><div class="label">Buoyancy force</div></div>
+    <div class="stat-card"><div class="value">1.8 kg</div><div class="label">Shell mass</div></div>
+  </div>
+
+  <div class="card">
+    <h3>Design Specification</h3>
+    <table>
+      <tr><td>Diameter</td><td class="num">800 mm</td></tr>
+      <tr><td>Volume (inflated)</td><td class="num">268 litres (0.268 m&sup3;)</td></tr>
+      <tr><td>Buoyancy force (fully submerged)</td><td class="num">2,696 N (275 kgf)</td></tr>
+      <tr><td>Righting torque at 170&deg; heel</td><td class="num">952 N&middot;m</td></tr>
+      <tr><td>Energy provided (180&deg;&rarr;240&deg; phase)</td><td class="num">~1,730 J (2&times; the wrong-way barrier)</td></tr>
+      <tr><td>Shell material</td><td>Vectran/nylon bladder (same as airbag)</td></tr>
+      <tr><td>Shell mass</td><td class="num">~1.8 kg</td></tr>
+      <tr><td>Inflation</td><td>Compressed air canister, auto-deploy on water contact</td></tr>
+      <tr><td>Mounting</td><td>Capsule roof, 200 mm off-axis (for initial moment at 180&deg;)</td></tr>
+      <tr><td>Stowed dimensions</td><td class="num">~300 &times; 200 &times; 80 mm (folded in roof cavity)</td></tr>
+      <tr><td>Colour</td><td>RAL 3024 Luminous Red (high-visibility, distinct from orange airbag)</td></tr>
+    </table>
+  </div>
+
+  <h3>How It Works</h3>
+  <div class="card" style="font-size:0.92rem;">
+    <ol style="padding-left:1.4rem; color:var(--text2);">
+      <li style="margin-bottom:0.6rem"><strong style="color:var(--text)">Water contact detected</strong> &mdash; accelerometer triggers inflation (same sensor as airbag). The sphere inflates in &lt; 2 seconds via compressed air canister.</li>
+      <li style="margin-bottom:0.6rem"><strong style="color:var(--text)">If upright:</strong> the sphere sits on the roof, above water. No effect on normal flotation. It&rsquo;s a bright red marker visible to recovery helicopters.</li>
+      <li style="margin-bottom:0.6rem"><strong style="color:var(--text)">If inverted:</strong> the sphere is underwater (Z<sub>world</sub> &asymp; &minus;0.3 m). Its 275 kgf buoyancy creates a righting torque of ~950 N&middot;m at 170&deg; heel. This doubles the natural departure rate from inverted.</li>
+      <li style="margin-bottom:0.6rem"><strong style="color:var(--text)">Energy injection:</strong> during the 180&deg;&rarr;240&deg; phase, the sphere provides ~1,730 J of kinetic energy &mdash; twice the 864 J energy barrier of the wrong-way GZ zones. The capsule arrives at 0&deg; with enough momentum to carry through, but not so much that it overshoots violently.</li>
+      <li style="margin-bottom:0.6rem"><strong style="color:var(--text)">Final settling:</strong> once near upright, the sphere is above water and contributes no further forces. The capsule settles on its natural GZ curve (GM = +0.61 m) within 5&ndash;8 seconds of reaching the upright zone.</li>
+    </ol>
+  </div>
+
+  <h3>Time-History Comparison</h3>
+  <div class="img-frame">
+    <img src="flotation_sphere_comparison.png" alt="Roll angle comparison: with and without sphere">
+    <div class="caption"><strong>Figure 7.</strong> Roll angle vs time from 180&deg; inverted start. Top (red): without sphere &mdash; chaotic oscillation lasting 30+ seconds. Bottom (green): with sphere &mdash; directed recovery reaching &plusmn;15&deg; in ~8 seconds.</div>
+  </div>
+
+  <div class="finding">
+    <div class="icon">&#127919;</div>
+    <div class="body">
+      <strong>Total self-righting system mass: 1.8 kg</strong>
+      <p>Compare with Orion&rsquo;s CMUS: 5 bags + 5 helium COPVs at 5,000 psi + pyrotechnic valves + plumbing = estimated 30&ndash;50 kg. The BLOON sphere is 15&ndash;25&times; lighter because the torus geometry does most of the work &mdash; the sphere only needs to inject energy to bridge the wrong-way GZ zones, not create the entire righting moment from scratch.</p>
+    </div>
+  </div>
 </section>
 
 <!-- RED TEAM / BLUE TEAM -->
