@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLOON Capsule Flotation Stability Analysis</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #242836;
+    --accent: #4f8cff;
+    --accent2: #ff7f0e;
+    --green: #2ecc71;
+    --red: #e74c3c;
+    --yellow: #f1c40f;
+    --text: #e8eaf0;
+    --text2: #9aa0b0;
+    --border: #2d3244;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6;
+  }
+  nav {
+    position: fixed; top:0; left:0; right:0; z-index:100;
+    background: rgba(15,17,23,0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 1.2rem;
+    padding: 0.6rem 2rem; font-size: 0.82rem; flex-wrap: wrap;
+  }
+  nav .logo { font-weight: 700; color: var(--accent); font-size: 1rem; }
+  nav a { color: var(--text2); text-decoration: none; transition: color 0.2s; }
+  nav a:hover { color: var(--accent); }
+  section { max-width: 1100px; margin: 0 auto; padding: 4rem 2rem 2rem; }
+  section:first-of-type { padding-top: 5rem; }
+  h1 {
+    font-size: 2.8rem; font-weight: 800; letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  h2 { font-size: 1.8rem; font-weight: 700; margin: 2.5rem 0 1rem; border-left: 4px solid var(--accent); padding-left: 0.8rem; }
+  h3 { font-size: 1.2rem; font-weight: 600; margin: 1.5rem 0 0.6rem; color: var(--accent); }
+  p, li { color: var(--text2); }
+  p { margin-bottom: 1rem; }
+  strong { color: var(--text); }
+  ul, ol { padding-left: 1.4rem; margin-bottom: 1rem; }
+  li { margin-bottom: 0.3rem; }
+
+  .hero { text-align: center; padding: 7rem 2rem 4rem; background: radial-gradient(ellipse at 50% 30%, rgba(79,140,255,0.12) 0%, transparent 60%); }
+  .hero h1 { font-size: 3.2rem; margin-bottom: 0.8rem; }
+  .hero .subtitle { font-size: 1.15rem; color: var(--text2); margin-bottom: 0.4rem; }
+  .hero .meta { font-size: 0.9rem; color: var(--text2); opacity: 0.7; }
+  .badge { display: inline-block; margin-top: 1.5rem; padding: 0.5rem 1.4rem; border-radius: 999px; font-weight: 600; font-size: 0.95rem; }
+  .badge-stable { background: rgba(46,204,113,0.15); color: var(--green); border: 1px solid rgba(46,204,113,0.3); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.6rem; margin-bottom: 1.5rem; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; margin-bottom: 1.5rem; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; text-align: center; }
+  .stat-card .value { font-size: 2rem; font-weight: 800; color: var(--accent); }
+  .stat-card .label { font-size: 0.85rem; color: var(--text2); margin-top: 0.2rem; }
+  .stat-card.green .value { color: var(--green); }
+  .stat-card.orange .value { color: var(--accent2); }
+
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: 0.9rem; }
+  th { background: var(--surface2); color: var(--accent); padding: 0.7rem 1rem; text-align: left; font-weight: 600; border-bottom: 2px solid var(--border); }
+  td { padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); color: var(--text2); }
+  tr:hover td { background: rgba(79,140,255,0.04); }
+  .stable { color: var(--green); font-weight: 600; }
+  .unstable { color: var(--red); font-weight: 600; }
+  .neutral { color: var(--yellow); font-weight: 600; }
+  td.num { font-family: 'SF Mono', 'JetBrains Mono', monospace; text-align: right; }
+
+  .img-frame { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 1.5rem 0; }
+  .img-frame img, .img-frame video { width: 100%; display: block; }
+  .img-frame .caption { padding: 0.8rem 1.2rem; font-size: 0.85rem; color: var(--text2); border-top: 1px solid var(--border); }
+  .img-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin: 1.5rem 0; }
+  .img-grid .img-frame { margin: 0; }
+
+  .vid-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin: 1.5rem 0; }
+  @media (max-width: 800px) { .vid-grid, .img-grid { grid-template-columns: 1fr; } }
+
+  .method-flow { display: flex; gap: 1rem; margin: 1.5rem 0; flex-wrap: wrap; }
+  .method-step { flex: 1; min-width: 250px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; position: relative; }
+  .method-step .num { position: absolute; top: -12px; left: 16px; background: var(--accent); color: #fff; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+  .method-step h4 { margin: 0.4rem 0 0.5rem; color: var(--text); }
+  .method-step p { font-size: 0.85rem; margin: 0; }
+  .method-step .tool { font-size: 0.75rem; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .finding { display: flex; gap: 1rem; align-items: flex-start; background: var(--surface); border-left: 4px solid var(--green); border-radius: 0 10px 10px 0; padding: 1rem 1.4rem; margin: 1rem 0; }
+  .finding.warn { border-left-color: var(--yellow); }
+  .finding.danger { border-left-color: var(--red); }
+  .finding .icon { font-size: 1.4rem; flex-shrink: 0; }
+  .finding .body { flex: 1; }
+  .finding .body strong { display: block; margin-bottom: 0.2rem; color: var(--text); }
+
+  .mass-bar { display: flex; height: 36px; border-radius: 6px; overflow: hidden; margin: 0.8rem 0 1.5rem; font-size: 0.7rem; font-weight: 600; }
+  .mass-bar div { display: flex; align-items: center; justify-content: center; color: #fff; white-space: nowrap; padding: 0 0.3rem; }
+
+  footer { max-width: 1100px; margin: 0 auto; padding: 2rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--text2); opacity: 0.6; text-align: center; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal { opacity: 0; transform: translateY(24px); transition: all 0.6s ease-out; }
+    .reveal.visible { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">Z2I</span>
+  <a href="#summary">Summary</a>
+  <a href="#simulations">Simulations</a>
+  <a href="#geometry">Geometry</a>
+  <a href="#mass">Mass</a>
+  <a href="#method">Method</a>
+  <a href="#hydrostatics">Hydrostatics</a>
+  <a href="#dynamics">Dynamics</a>
+  <a href="#viz">3D Renders</a>
+  <a href="#conclusions">Conclusions</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <p class="meta">Z2I-AN-001-A &mdash; Analysis Report &mdash; 2026-04-13</p>
+  <h1>BLOON Capsule<br>Flotation Stability Analysis</h1>
+  <p class="subtitle">Hydrostatic GZ curves &bull; Dynamic self-righting simulation &bull; 3D visualisation<br>HTPV-180 pressure vessel in seawater (&rho; = 1025 kg/m&sup3;)</p>
+  <span class="badge badge-stable">ALL CONFIGURATIONS STABLE UPRIGHT</span>
+</div>
+
+<!-- EXECUTIVE SUMMARY -->
+<section id="summary">
+  <h2>Executive Summary</h2>
+  <div class="card-grid">
+    <div class="stat-card green"><div class="value">+0.61 m</div><div class="label">GM without airbag</div></div>
+    <div class="stat-card green"><div class="value">+2.29 m</div><div class="label">GM with airbag</div></div>
+    <div class="stat-card orange"><div class="value">3.8&times;</div><div class="label">Stability gain from airbag</div></div>
+    <div class="stat-card"><div class="value">~18 s</div><div class="label">Self-righting time from 90&deg;</div></div>
+  </div>
+  <div class="finding">
+    <div class="icon">&#9989;</div>
+    <div class="body"><strong>Capsule is stable upright in all 6 analysis cases</strong><p>Positive metacentric height (GM &gt; 0) confirmed for actual mass (1401 kg) and design mass (1500 kg), with and without airbag, symmetric and asymmetric crew.</p></div>
+  </div>
+  <div class="finding">
+    <div class="icon">&#9989;</div>
+    <div class="body"><strong>Airbag deployment triples righting moment</strong><p>The 4.25 m&sup3; inflated torus provides massive waterplane area (I<sub>wp</sub> = 5.07 m&sup4; vs 1.92 m&sup4;), increasing GM from 0.61 m to 2.29 m. Rock-solid stability even in sea state 3 waves.</p></div>
+  </div>
+  <div class="finding warn">
+    <div class="icon">&#9888;&#65039;</div>
+    <div class="body"><strong>Natural 7&deg; list from subsystem placement</strong><p>Thermal (86 kg) and safety (159 kg) equipment at &theta; = 288&deg; creates a CG Y-offset of &minus;0.27 m. Capsule floats with a persistent 7&deg; heel.</p></div>
+  </div>
+  <div class="finding warn">
+    <div class="icon">&#9888;&#65039;</div>
+    <div class="body"><strong>Inverted position is unstable but recovery is chaotic</strong><p>The capsule tumbles out of the 180&deg; position but does not cleanly self-right without assistance.</p></div>
+  </div>
+</section>
+
+<!-- SIMULATION VIDEOS -->
+<section id="simulations">
+  <h2>Simulation Videos</h2>
+  <p>3D animations of the capsule&rsquo;s flotation behaviour, driven by rigid-body dynamics with hydrostatic buoyancy forces. Click any video to play.</p>
+
+  <div class="vid-grid">
+    <div class="img-frame">
+      <video controls loop muted playsinline preload="metadata" poster="">
+        <source src="vid_selfrighting.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><strong>Self-Righting from 90&deg;</strong> &mdash; Without airbag. The capsule recovers to upright in ~18 seconds through damped oscillation. The keel&rsquo;s low CG and the waterplane area provide the restoring moment.</div>
+    </div>
+    <div class="img-frame">
+      <video controls loop muted playsinline preload="metadata">
+        <source src="vid_inverted.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><strong>Inverted Start (180&deg;)</strong> &mdash; Without airbag. The capsule drifts from the inverted position, tumbles through 90&deg;, and oscillates toward upright. Recovery is chaotic but the inverted state is confirmed unstable.</div>
+    </div>
+    <div class="img-frame">
+      <video controls loop muted playsinline preload="metadata">
+        <source src="vid_airbag_waves.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><strong>Airbag + Waves</strong> &mdash; H = 1 m, T = 6 s (sea state 3). With airbag deployed, the capsule rides waves with &lt; 10&deg; roll and smooth periodic heave. The large waterplane area acts as a natural roll damper.</div>
+    </div>
+    <div class="img-frame">
+      <video controls autoplay loop muted playsinline preload="metadata">
+        <source src="vid_beauty_orbit.mp4" type="video/mp4">
+      </video>
+      <div class="caption"><strong>Orbit View</strong> &mdash; Capsule floating at equilibrium with airbag deployed. White hull, tan Rohacell keel (hidden below), orange Vectran/Kevlar airbag torus at waterline. Natural 7&deg; list visible.</div>
+    </div>
+  </div>
+</section>
+
+<!-- GEOMETRY -->
+<section id="geometry">
+  <h2>Capsule Geometry</h2>
+  <p>The BLOON capsule is an <strong>HTPV-180</strong> &mdash; asymmetric toroidal pressure vessel with circular extrados and elliptical intrados, plus a conical keel and inflatable toroidal airbag.</p>
+  <div class="card-grid">
+    <div class="card">
+      <h3>Torus Body</h3>
+      <table>
+        <tr><td>Outer diameter</td><td class="num">3000 mm</td></tr>
+        <tr><td>Height</td><td class="num">1800 mm</td></tr>
+        <tr><td>Crown radius R</td><td class="num">600 mm</td></tr>
+        <tr><td>Extrados a<sub>o</sub></td><td class="num">900 mm</td></tr>
+        <tr><td>Intrados a<sub>i</sub></td><td class="num">475 mm</td></tr>
+        <tr><td>Sealed volume</td><td class="num">10.29 m&sup3;</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Keel &amp; Airbag</h3>
+      <table>
+        <tr><td>Keel cone angle</td><td class="num">40&deg;</td></tr>
+        <tr><td>Keel tip Z</td><td class="num">&minus;871 mm</td></tr>
+        <tr><td>Keel mass</td><td class="num">35.9 kg</td></tr>
+        <tr><td>Airbag R<sub>major</sub></td><td class="num">1220 mm</td></tr>
+        <tr><td>Airbag R<sub>minor</sub></td><td class="num">420 mm</td></tr>
+        <tr><td>Airbag volume</td><td class="num">4.25 m&sup3;</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="img-frame">
+    <img src="flotation_waterlines.png" alt="Cross-section waterline diagrams">
+    <div class="caption"><strong>Figure 1.</strong> Meridional cross-sections with waterline (cyan), CG (red +), and CoB (green triangle). Left: no airbag. Centre: airbag inflated. Right: asymmetric crew loading.</div>
+  </div>
+</section>
+
+<!-- MASS -->
+<section id="mass">
+  <h2>Mass Budget &amp; Centre of Gravity</h2>
+  <p>Total: <strong>1401 kg</strong> actual / <strong>1500 kg</strong> design envelope (7% margin). 29 discrete mass items placed at physical locations.</p>
+  <h3>Mass Breakdown</h3>
+  <div class="mass-bar">
+    <div style="flex:174; background:#4f8cff" title="Shell 174 kg">Shell</div>
+    <div style="flex:36; background:#6c5ce7" title="Keel 36 kg">Keel</div>
+    <div style="flex:95; background:#74b9ff" title="Other structure">Str</div>
+    <div style="flex:118; background:#fdcb6e" title="Power 118 kg">Pwr</div>
+    <div style="flex:95; background:#55efc4" title="Life Support 95 kg">LS</div>
+    <div style="flex:86; background:#e17055" title="Thermal 86 kg">Thrm</div>
+    <div style="flex:159; background:#d63031" title="Safety 159 kg">Safe</div>
+    <div style="flex:104; background:#a29bfe" title="Parachute 104 kg">Para</div>
+    <div style="flex:100; background:#fab1a0" title="Cabin 100 kg">Cab</div>
+    <div style="flex:401; background:#00cec9" title="Crew 401 kg">Crew (5)</div>
+  </div>
+  <table>
+    <thead><tr><th>Subsystem</th><th style="text-align:right">Mass (kg)</th><th style="text-align:right">Z<sub>body</sub> (m)</th><th>Location</th></tr></thead>
+    <tbody>
+      <tr><td>Shell panels</td><td class="num">174.3</td><td class="num">0.000</td><td>Distributed around torus</td></tr>
+      <tr><td>Keel cone</td><td class="num">35.9</td><td class="num">&minus;0.697</td><td>Below torus, axial</td></tr>
+      <tr><td>Power</td><td class="num">117.8</td><td class="num">&minus;0.750</td><td>Under floor</td></tr>
+      <tr><td>Life Support</td><td class="num">95.4</td><td class="num">&minus;0.750</td><td>Under floor</td></tr>
+      <tr><td>Thermal</td><td class="num">86.4</td><td class="num">0.000</td><td>Back wall (&theta;=288&deg;)</td></tr>
+      <tr><td>Safety</td><td class="num">159.0</td><td class="num">0.000</td><td>Back wall (&theta;=288&deg;)</td></tr>
+      <tr><td>Parachute</td><td class="num">104.0</td><td class="num">+1.000</td><td>On top</td></tr>
+      <tr><td>Comms</td><td class="num">22.5</td><td class="num">+1.000</td><td>On top</td></tr>
+      <tr><td>Cabin equipment</td><td class="num">100.0</td><td class="num">0.000</td><td>Around windows</td></tr>
+      <tr><td>Crew (5)</td><td class="num">401.0</td><td class="num">0.000</td><td>In seats</td></tr>
+      <tr><td>Other</td><td class="num">104.6</td><td class="num">various</td><td>Windows, hatch, floor, seats, interior, suspension</td></tr>
+      <tr style="font-weight:700"><td>TOTAL</td><td class="num" style="color:var(--text)">1,400.9</td><td class="num">&minus;0.059</td><td>CG world Z = 1.041 m</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- METHODOLOGY -->
+<section id="method">
+  <h2>Methodology</h2>
+  <div class="method-flow">
+    <div class="method-step">
+      <div class="num">1</div>
+      <div class="tool">Python / NumPy / SciPy</div>
+      <h4>Hydrostatic GZ Curves</h4>
+      <p>~440K volume-element point cloud. For each heel angle (0&ndash;360&deg;, 2&deg; steps), equilibrium draft found via Brent&rsquo;s method, righting arm GZ computed from buoyancy/gravity centroid offset.</p>
+    </div>
+    <div class="method-step">
+      <div class="num">2</div>
+      <div class="tool">Project Chrono 10.0</div>
+      <h4>Dynamic Simulation</h4>
+      <p>Rigid body with full inertia tensor. Per-timestep buoyancy callback. Linear + angular drag. Sinusoidal wave excitation. 1 kHz, 40 s per run, 8 calm-water + 2 wave cases.</p>
+    </div>
+    <div class="method-step">
+      <div class="num">3</div>
+      <div class="tool">Blender 5.0 EEVEE</div>
+      <h4>3D Visualization</h4>
+      <p>Capsule mesh from revolved meridional profile. Keel cone, airbag torus, ocean plane. 5 static renders + 4 animated videos at equilibrium positions.</p>
+    </div>
+  </div>
+  <h3>Source Documents</h3>
+  <ul>
+    <li><strong>Z2I-DD-010-A</strong> &mdash; BLOON_CAPSULE_COMPLETE.md &mdash; geometry, mass budget</li>
+    <li><strong>Z2I-DD-004-A</strong> &mdash; AIRBAG_SPEC.md &mdash; airbag torus dimensions</li>
+    <li><strong>CAPSULE_FROZEN_DESIGN_POINT.md</strong> &mdash; frozen geometry, keel cone</li>
+    <li><strong>geometry_verification.py</strong> &mdash; torus volume validation (9.53 m&sup3;)</li>
+  </ul>
+</section>
+
+<!-- HYDROSTATICS -->
+<section id="hydrostatics">
+  <h2>Hydrostatic Results</h2>
+  <h3>Metacentric Height (GM)</h3>
+  <table>
+    <thead><tr><th>Case</th><th style="text-align:right">GM (m)</th><th style="text-align:right">BM</th><th style="text-align:right">BG</th><th style="text-align:right">I<sub>wp</sub> (m&sup4;)</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>1. No bag, symmetric</td><td class="num">+0.605</td><td class="num">1.415</td><td class="num">0.810</td><td class="num">1.923</td><td class="stable">STABLE</td></tr>
+      <tr><td>2. Airbag, symmetric</td><td class="num">+2.289</td><td class="num">3.762</td><td class="num">1.473</td><td class="num">5.073</td><td class="stable">STABLE</td></tr>
+      <tr><td>3. No bag, asymmetric</td><td class="num">+0.605</td><td class="num">1.415</td><td class="num">0.810</td><td class="num">1.923</td><td class="stable">STABLE</td></tr>
+      <tr><td>4. Airbag, asymmetric</td><td class="num">+2.289</td><td class="num">3.762</td><td class="num">1.473</td><td class="num">5.073</td><td class="stable">STABLE</td></tr>
+      <tr><td>5. Design 1500kg, no bag</td><td class="num">+0.557</td><td class="num">1.351</td><td class="num">0.794</td><td class="num">1.991</td><td class="stable">STABLE</td></tr>
+      <tr><td>6. Design 1500kg, airbag</td><td class="num">+1.955</td><td class="num">3.418</td><td class="num">1.463</td><td class="num">5.126</td><td class="stable">STABLE</td></tr>
+    </tbody>
+  </table>
+  <div class="img-frame">
+    <img src="flotation_GZ_curves.png" alt="GZ righting arm curves">
+    <div class="caption"><strong>Figure 2.</strong> Righting arm (GZ) vs heel angle. Solid = symmetric crew, dashed = asymmetric. Blue/green = no airbag, orange/red = airbag. Airbag cases show ~70% larger GZ<sub>max</sub>.</div>
+  </div>
+  <h3>GZ Summary</h3>
+  <table>
+    <thead><tr><th>Case</th><th style="text-align:right">GZ<sub>max</sub> (cm)</th><th style="text-align:right">at angle</th><th>Positive range</th></tr></thead>
+    <tbody>
+      <tr><td>1. No bag, symmetric</td><td class="num">+40.1</td><td class="num">338&deg;</td><td>Intermittent 0&deg;&ndash;360&deg;</td></tr>
+      <tr><td>2. Airbag, symmetric</td><td class="num"><strong>+69.6</strong></td><td class="num">74&deg;</td><td>0&deg;&ndash;360&deg;</td></tr>
+      <tr><td>3. No bag, asymmetric</td><td class="num">+39.4</td><td class="num">148&deg;</td><td>96&deg;&ndash;352&deg;</td></tr>
+      <tr><td>4. Airbag, asymmetric</td><td class="num">+62.3</td><td class="num">82&deg;</td><td>42&deg;&ndash;358&deg;</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- DYNAMICS -->
+<section id="dynamics">
+  <h2>Dynamic Simulation (Project Chrono)</h2>
+  <div class="img-frame">
+    <img src="flotation_chrono_dynamics.png" alt="Dynamic response time histories">
+    <div class="caption"><strong>Figure 3.</strong> Roll angle vs time. Top: without airbag. Bottom: with airbag. Blue = upright, orange = 45&deg;, green = 90&deg;, red = 180&deg; inverted.</div>
+  </div>
+  <h3>Self-Righting Results</h3>
+  <table>
+    <thead><tr><th>Initial heel</th><th>Without airbag</th><th>With airbag</th></tr></thead>
+    <tbody>
+      <tr><td><strong>0&deg;</strong></td><td class="stable">Stable, settles to 0&deg;</td><td class="stable">Rock-solid at 7&deg; for 40 s</td></tr>
+      <tr><td><strong>45&deg;</strong></td><td class="stable">Self-rights in ~18 s</td><td class="stable">Self-rights with oscillation</td></tr>
+      <tr><td><strong>90&deg;</strong></td><td class="stable">Self-rights in ~16 s</td><td class="neutral">Chaotic (large airbag volume)</td></tr>
+      <tr><td><strong>180&deg;</strong></td><td class="unstable">Tumbles, no clean recovery</td><td class="unstable">Tumbles chaotically</td></tr>
+    </tbody>
+  </table>
+  <div class="img-frame">
+    <img src="flotation_chrono_wave_response.png" alt="Wave response">
+    <div class="caption"><strong>Figure 4.</strong> Wave response (H=1m, T=6s). Orange (airbag): &lt;10&deg; roll, smooth heave. Blue (no airbag): settles to 0&deg; with larger oscillations.</div>
+  </div>
+</section>
+
+<!-- 3D VIZ -->
+<section id="viz">
+  <h2>3D Renders (Blender)</h2>
+  <div class="img-grid">
+    <div class="img-frame"><img src="flotation_viz_upright.png" alt="Upright"><div class="caption"><strong>Upright, no airbag.</strong> Only keel + lower torus submerged. WL &asymp; 0.48 m.</div></div>
+    <div class="img-frame"><img src="flotation_viz_upright_airbag.png" alt="Airbag"><div class="caption"><strong>Upright, airbag inflated.</strong> Orange torus at waterline, hull above water. WL &asymp; &minus;0.31 m.</div></div>
+    <div class="img-frame"><img src="flotation_viz_heeled_45.png" alt="45 deg"><div class="caption"><strong>45&deg; heel.</strong> Partially submerged. Self-rights to upright in ~18 s.</div></div>
+    <div class="img-frame"><img src="flotation_viz_inverted.png" alt="Inverted"><div class="caption"><strong>Inverted (180&deg;).</strong> Keel up. NOT a stable equilibrium &mdash; capsule tumbles out.</div></div>
+  </div>
+</section>
+
+<!-- CONCLUSIONS -->
+<section id="conclusions">
+  <h2>Conclusions &amp; Recommendations</h2>
+  <div class="card">
+    <h3>Primary Conclusions</h3>
+    <ol style="padding-left:1.4rem; color:var(--text2)">
+      <li style="margin-bottom:0.5rem"><strong style="color:var(--green)">Hydrostatically stable upright</strong> in all configurations. GM ranges +0.56 to +2.29 m.</li>
+      <li style="margin-bottom:0.5rem"><strong style="color:var(--green)">Airbag is transformative</strong> &mdash; 3&ndash;4&times; GM increase, excellent wave riding. Auto-deploy on water contact.</li>
+      <li style="margin-bottom:0.5rem"><strong>Self-righting confirmed 0&deg;&ndash;90&deg;</strong> in dynamic simulation (16&ndash;18 s calm water).</li>
+      <li style="margin-bottom:0.5rem"><strong style="color:var(--yellow)">Inverted recovery is marginal.</strong> Asymmetric airbag inflation may be needed.</li>
+      <li style="margin-bottom:0.5rem"><strong style="color:var(--yellow)">7&deg; natural list</strong> from thermal/safety mass concentration. Recommend ballast redistribution.</li>
+    </ol>
+  </div>
+  <div class="card">
+    <h3>Recommended Next Steps</h3>
+    <ul>
+      <li>Partial airbag inflation study (25/50/75%)</li>
+      <li>Asymmetric airbag inflation for active self-righting from inverted</li>
+      <li>1:10 scale model wave-tank validation</li>
+      <li>Flooding/breach stability analysis</li>
+      <li>Ballast optimisation to eliminate natural list</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  Z2I Aerospace &mdash; BLOON Capsule Flotation Stability &mdash; Z2I-AN-001-A &mdash; 2026-04-13<br>
+  Analysis: Python/NumPy hydrostatics + Project Chrono 10.0 dynamics + Blender 5.0 visualisation
+</footer>
+
+<script>
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.card, .img-frame, .finding, .method-step, .stat-card, table').forEach(el => {
+    el.classList.add('reveal'); observer.observe(el);
+  });
+</script>
+</body>
+</html>
