@@ -120,6 +120,7 @@
   <a href="#dynamics">Dynamics</a>
   <a href="#viz">3D Renders</a>
   <a href="#orion">vs Orion</a>
+  <a href="#redblue">Red/Blue Team</a>
   <a href="#conclusions">Conclusions</a>
 </nav>
 
@@ -452,6 +453,193 @@
 
   <h3>Historical Context: Apollo Uprighting</h3>
   <p>The Apollo Command Module (CM) had the same two-stable-point problem. Of 19 ocean splashdowns, <strong>9 (47%) ended in Stable 2</strong> (inverted). Apollo used 3 inflatable bags (&ldquo;uprighting balloons&rdquo;) in the nose section. These were pressurised by the crew manually activating compressors &mdash; a process that took several minutes with the astronauts hanging upside-down in their harnesses, often seasick. The Orion CMUS is the modern evolution of this system, now automatic but still mechanically complex.</p>
+</section>
+
+<!-- RED TEAM / BLUE TEAM -->
+<section id="redblue">
+  <h2>Red Team / Blue Team Analysis</h2>
+  <p>Adversarial review of the flotation stability conclusions. The <span style="color:var(--red);font-weight:700">Red Team</span> attacks assumptions, identifies failure modes, and challenges the &ldquo;no uprighting system needed&rdquo; claim. The <span style="color:var(--accent);font-weight:700">Blue Team</span> defends, provides counter-evidence, and proposes mitigations.</p>
+
+  <!-- ATTACK 1 -->
+  <div class="card" style="border-color:#d63031; position:relative; overflow:visible;">
+    <span style="position:absolute;top:-14px;left:16px;background:#d63031;color:#fff;font-weight:700;font-size:0.75rem;padding:2px 12px;border-radius:6px;text-transform:uppercase;letter-spacing:0.05em;">Critical</span>
+    <div style="display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:0.4rem;">
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--red)">&#128308; Inverted recovery is chaotic, not guaranteed</h3>
+        <p style="font-size:0.88rem">The Chrono simulation shows the capsule <em>leaves</em> the 180&deg; position but does NOT cleanly return to upright. It tumbles through wildly varying angles. With passengers aboard, this is a roll-over hazard. &ldquo;Not staying inverted&rdquo; is not the same as &ldquo;self-righting.&rdquo; Orion&rsquo;s CMUS guarantees recovery in &lt; 4 minutes. BLOON has no equivalent.</p>
+      </div>
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--accent)">&#128309; Defence</h3>
+        <p style="font-size:0.88rem">The chaotic tumbling is partly a numerical artefact &mdash; the discrete buoyancy model creates force spikes at the waterline. In reality, water damping smooths the motion. The hydrostatic GZ curve is the primary evidence: there is <strong>no stable equilibrium at 180&deg;</strong>. The capsule must eventually settle to the only stable point (upright). The real question is <em>how long</em> this takes.</p>
+        <p style="font-size:0.85rem;color:var(--yellow)"><strong>Mitigation:</strong> Wave-tank model testing at 1:10 scale to measure actual recovery time from inverted. If &gt; 5 minutes, add a small asymmetric ballast (e.g., 10 kg offset weight) to bias recovery direction.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATTACK 2 -->
+  <div class="card" style="border-color:#d63031; position:relative; overflow:visible;">
+    <span style="position:absolute;top:-14px;left:16px;background:#d63031;color:#fff;font-weight:700;font-size:0.75rem;padding:2px 12px;border-radius:6px;text-transform:uppercase;letter-spacing:0.05em;">Critical</span>
+    <div style="display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:0.4rem;">
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--red)">&#128308; Hull breach / flooding scenario not analysed</h3>
+        <p style="font-size:0.88rem">The entire analysis assumes a sealed pressure vessel. After a hard splashdown (15 m/s design case), a window pane, hatch seal, or welded joint could fail. Partial flooding changes the mass, CG, and free-surface effect dramatically. The capsule could become unstable or even sink &mdash; the pressurised volume is only 10.3 m&sup3; and the displacement needed is 1.37 m&sup3;. Even 1.5 m&sup3; of flooding would sink it.</p>
+      </div>
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--accent)">&#128309; Defence</h3>
+        <p style="font-size:0.88rem">The pressure vessel survives 101 kPa differential at 30 km altitude with SF &ge; 3.0 &mdash; ocean impact loads are an order of magnitude lower. The 8.9g airbag deceleration is within structural margins. Polycarbonate windows (10 mm, stretched grade, 120 MPa yield) are effectively unbreakable in this regime. The keel absorbs 0.84 MJ &mdash; 5&times; the hard-landing energy.</p>
+        <p style="font-size:0.85rem;color:var(--yellow)"><strong>Mitigation:</strong> Flooding analysis should be performed for the CDR phase. Add a bilge pump (manual or automatic) as defence-in-depth. The airbag provides 4.25 m&sup3; of additional buoyancy &mdash; even with 2 m&sup3; of flooding, the capsule stays afloat with airbag deployed.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATTACK 3 -->
+  <div class="card" style="border-color:#e17055; position:relative; overflow:visible;">
+    <span style="position:absolute;top:-14px;left:16px;background:#e17055;color:#fff;font-weight:700;font-size:0.75rem;padding:2px 12px;border-radius:6px;text-transform:uppercase;letter-spacing:0.05em;">Serious</span>
+    <div style="display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:0.4rem;">
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--red)">&#128308; Airbag is a single-point-of-failure for high stability</h3>
+        <p style="font-size:0.88rem">Without the airbag, GM drops from 2.29 m to 0.61 m. The report presents the airbag as a bonus, but the &ldquo;no uprighting system needed&rdquo; claim relies on GM = 0.61 m being sufficient. For comparison, IMO SOLAS requires GM &ge; 0.15 m for cargo ships. But this is a <em>crewed passenger capsule</em> in open ocean &mdash; a higher bar applies. If the airbag fails to deploy, the 0.61 m GM provides only marginal safety in rough seas.</p>
+      </div>
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--accent)">&#128309; Defence</h3>
+        <p style="font-size:0.88rem">GM = 0.61 m exceeds IMO criteria by 4&times;. Even without the airbag, the capsule self-rights from 90&deg; in 16 s (confirmed by Chrono). The airbag is carried anyway for landing energy absorption &mdash; its flotation benefit is a design bonus, not a dependency. Unlike Orion&rsquo;s CMUS (which IS the only path from Stable 2), BLOON is stable without any auxiliary system. The airbag merely improves an already-safe baseline.</p>
+        <p style="font-size:0.85rem;color:var(--yellow)"><strong>Mitigation:</strong> Add airbag inflation redundancy (dual-valve, dual-gas-supply) to reduce failure probability. This is far simpler than Orion&rsquo;s 5-bag CMUS.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATTACK 4 -->
+  <div class="card" style="border-color:#e17055; position:relative; overflow:visible;">
+    <span style="position:absolute;top:-14px;left:16px;background:#e17055;color:#fff;font-weight:700;font-size:0.75rem;padding:2px 12px;border-radius:6px;text-transform:uppercase;letter-spacing:0.05em;">Serious</span>
+    <div style="display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:0.4rem;">
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--red)">&#128308; 7&deg; natural list &mdash; seed for parametric rolling</h3>
+        <p style="font-size:0.88rem">The 245 kg mass concentration at &theta; = 288&deg; (thermal + safety) causes a permanent 7&deg; heel. In beam seas, this asymmetry could couple with wave excitation to produce parametric rolling &mdash; a resonant phenomenon where roll amplitude grows exponentially. The wave-response simulation only tested head seas with a simple sinusoidal model, not irregular beam seas.</p>
+      </div>
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--accent)">&#128309; Defence</h3>
+        <p style="font-size:0.88rem">Parametric rolling requires a specific relationship between wave encounter frequency and roll natural frequency. The capsule&rsquo;s roll period T<sub>roll</sub> &asymp; 2&pi;&radic;(I<sub>xx</sub>/(MgGM)) &asymp; 1.9 s. This is much shorter than typical ocean wave periods (6&ndash;12 s), making parametric resonance unlikely. Furthermore, the large roll damping from the submerged keel and airbag suppresses any amplification.</p>
+        <p style="font-size:0.85rem;color:var(--yellow)"><strong>Mitigation:</strong> Eliminate the list entirely by relocating ~60 kg of safety equipment from &theta;=288&deg; to &theta;=108&deg;, or adding a 60 kg permanent ballast at &theta;=108&deg;.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATTACK 5 -->
+  <div class="card" style="border-color:#e17055; position:relative; overflow:visible;">
+    <span style="position:absolute;top:-14px;left:16px;background:#e17055;color:#fff;font-weight:700;font-size:0.75rem;padding:2px 12px;border-radius:6px;text-transform:uppercase;letter-spacing:0.05em;">Serious</span>
+    <div style="display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:0.4rem;">
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--red)">&#128308; No experimental validation &mdash; zero model testing</h3>
+        <p style="font-size:0.88rem">The entire stability case rests on a numerical model with a 25 mm point-cloud discretisation. No wave-tank tests, no scale models, no physical measurements. The GZ curve shape depends sensitively on the hull profile &mdash; small errors in the torus parametrisation (e.g., transition panels, central cylinder geometry) could shift GM by &plusmn;20%. Apollo&rsquo;s stability was validated with extensive scale-model testing at Langley and full-scale drops.</p>
+      </div>
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--accent)">&#128309; Defence</h3>
+        <p style="font-size:0.88rem">This is a Phase A preliminary analysis. The computational approach is standard practice (DNV-GL, Lloyd&rsquo;s, Bureau Veritas all accept numerical GZ curves for initial assessment). The hull volume was cross-checked against geometry_verification.py (9.53 m&sup3; documented, 10.29 m&sup3; sealed envelope). The &plusmn;20% GM uncertainty still keeps GM positive in all cases (worst case: 0.61 &times; 0.8 = 0.49 m, still 3&times; IMO minimum).</p>
+        <p style="font-size:0.85rem;color:var(--yellow)"><strong>Mitigation:</strong> 1:10 scale model testing is the #1 recommended next step. Budget ~4 weeks and &euro;15K for a wave-tank campaign.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATTACK 6 -->
+  <div class="card" style="border-color:#e17055; position:relative; overflow:visible;">
+    <span style="position:absolute;top:-14px;left:16px;background:#e17055;color:#fff;font-weight:700;font-size:0.75rem;padding:2px 12px;border-radius:6px;text-transform:uppercase;letter-spacing:0.05em;">Serious</span>
+    <div style="display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:0.4rem;">
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--red)">&#128308; Crushed keel changes everything</h3>
+        <p style="font-size:0.88rem">The Rohacell keel is a crushable energy absorber designed to compress on impact. After a hard landing (15 m/s, 168 kJ), the keel may be fully crushed &mdash; its height reduces from 1071 mm to perhaps 600 mm. This raises the CG (the keel mass moves up) and changes the hull&rsquo;s submerged profile. The analysis assumes an intact keel. Post-crush flotation could be significantly different.</p>
+      </div>
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--accent)">&#128309; Defence</h3>
+        <p style="font-size:0.88rem">Keel compression actually <em>helps</em> stability: the 35.9 kg keel mass moves upward toward the torus centre, but the keel&rsquo;s buoyancy contribution also reduces (shorter, stubbier cone displaces less water far below CG). The net effect is a slight <em>increase</em> in GM because the destabilising keel buoyancy below the waterline is reduced. The dominant stability contributors (waterplane area, shell mass distribution) are unaffected by keel crush.</p>
+        <p style="font-size:0.85rem;color:var(--yellow)"><strong>Mitigation:</strong> Run the hydrostatic analysis with a half-height keel (Z_tip = &minus;0.34 m) to quantify. Expected result: GM changes by &lt; 5%.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATTACK 7 -->
+  <div class="card" style="border-color:var(--border); position:relative; overflow:visible;">
+    <span style="position:absolute;top:-14px;left:16px;background:#636e72;color:#fff;font-weight:700;font-size:0.75rem;padding:2px 12px;border-radius:6px;text-transform:uppercase;letter-spacing:0.05em;">Minor</span>
+    <div style="display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:0.4rem;">
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--red)">&#128308; Mass discrepancy: 1401 kg computed vs 1320 kg documented</h3>
+        <p style="font-size:0.88rem">The mass model sums to 1401 kg, but the documented system mass is 1319.7 kg &mdash; an 81 kg discrepancy (~6%). This suggests an error in crew mass (model uses 4&times;80+81=401 kg; spec may intend 321 kg). If the real mass is lower, the capsule floats higher, waterplane area is smaller, and GM could decrease.</p>
+      </div>
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--accent)">&#128309; Defence</h3>
+        <p style="font-size:0.88rem">Case 5 (1500 kg, design mass) and Case 1 (1401 kg) bracket the expected range. GM varies only 0.56&ndash;0.61 m across this range &mdash; the stability verdict is insensitive to &plusmn;100 kg mass variation. The design-mass case is the conservative one (higher mass = deeper draft = GM slightly lower), and it&rsquo;s still clearly stable.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATTACK 8 -->
+  <div class="card" style="border-color:var(--border); position:relative; overflow:visible;">
+    <span style="position:absolute;top:-14px;left:16px;background:#636e72;color:#fff;font-weight:700;font-size:0.75rem;padding:2px 12px;border-radius:6px;text-transform:uppercase;letter-spacing:0.05em;">Minor</span>
+    <div style="display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:0.4rem;">
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--red)">&#128308; Chrono simulations all diverged &mdash; credibility gap</h3>
+        <p style="font-size:0.88rem">Every Chrono simulation hit NaN within 15&ndash;29 seconds. The &ldquo;physically valid pre-divergence data&rdquo; claim is convenient but unverifiable. How do we know the physics was correct at t = 15 s if the integrator blew up at t = 16 s? This undermines the dynamic stability claims.</p>
+      </div>
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--accent)">&#128309; Defence</h3>
+        <p style="font-size:0.88rem">The divergence mechanism is well-understood: the discrete buoyancy model creates force discontinuities when the capsule bounces off the water surface (V_sub jumps from 0 to a large value in one timestep). This is a numerical artefact, not a physical instability. The <strong>hydrostatic GZ analysis</strong> (no time integration) is the primary evidence &mdash; it has no divergence issues and provides definitive stability answers. The Chrono results are confirmatory, not primary.</p>
+        <p style="font-size:0.85rem;color:var(--yellow)"><strong>Mitigation:</strong> Implement smooth buoyancy transition (sigmoid ramp over &plusmn;50 mm at waterline) or use a SPH (Smoothed Particle Hydrodynamics) solver for future dynamic analysis.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATTACK 9 -->
+  <div class="card" style="border-color:var(--border); position:relative; overflow:visible;">
+    <span style="position:absolute;top:-14px;left:16px;background:#636e72;color:#fff;font-weight:700;font-size:0.75rem;padding:2px 12px;border-radius:6px;text-transform:uppercase;letter-spacing:0.05em;">Minor</span>
+    <div style="display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:0.4rem;">
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--red)">&#128308; Orion comparison is biased &mdash; 7&times; mass difference</h3>
+        <p style="font-size:0.88rem">Comparing a 10.4-tonne deep-space reentry vehicle to a 1.4-tonne balloon capsule is misleading. Orion survives 11 km/s reentry; BLOON descends by parachute. The &ldquo;BLOON doesn&rsquo;t need CMUS&rdquo; conclusion is trivially true &mdash; the shape is different, not the engineering superiority. A cone could also be made self-righting with enough keel weight.</p>
+      </div>
+      <div style="flex:1;min-width:260px;">
+        <h3 style="color:var(--accent)">&#128309; Defence</h3>
+        <p style="font-size:0.88rem">The comparison illustrates a <em>shape-driven</em> design advantage, not a size advantage. The torus has one stable point regardless of scale. A 10-tonne torus would also have one stable point. The point is that BLOON&rsquo;s toroidal architecture was <em>chosen well</em> for ocean recovery &mdash; the frustum shape of traditional capsules creates an inherent two-stable-point problem that requires mechanical countermeasures. This is a legitimate architectural comparison.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCORECARD -->
+  <h3>Verdict Scorecard</h3>
+  <table>
+    <thead>
+      <tr><th>Attack</th><th>Severity</th><th>Red Team Score</th><th>Blue Team Score</th><th>Net</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Chaotic inverted recovery</td><td class="unstable">CRITICAL</td><td class="num">8/10</td><td class="num">6/10</td><td class="neutral">RED +2</td></tr>
+      <tr><td>Hull breach / flooding</td><td class="unstable">CRITICAL</td><td class="num">7/10</td><td class="num">7/10</td><td>DRAW</td></tr>
+      <tr><td>Airbag single-point failure</td><td class="neutral">SERIOUS</td><td class="num">6/10</td><td class="num">8/10</td><td class="stable">BLUE +2</td></tr>
+      <tr><td>7&deg; list &amp; parametric roll</td><td class="neutral">SERIOUS</td><td class="num">5/10</td><td class="num">7/10</td><td class="stable">BLUE +2</td></tr>
+      <tr><td>No experimental validation</td><td class="neutral">SERIOUS</td><td class="num">7/10</td><td class="num">6/10</td><td class="neutral">RED +1</td></tr>
+      <tr><td>Crushed keel</td><td class="neutral">SERIOUS</td><td class="num">5/10</td><td class="num">7/10</td><td class="stable">BLUE +2</td></tr>
+      <tr><td>Mass discrepancy</td><td>MINOR</td><td class="num">4/10</td><td class="num">8/10</td><td class="stable">BLUE +4</td></tr>
+      <tr><td>Chrono divergence</td><td>MINOR</td><td class="num">5/10</td><td class="num">7/10</td><td class="stable">BLUE +2</td></tr>
+      <tr><td>Biased Orion comparison</td><td>MINOR</td><td class="num">4/10</td><td class="num">7/10</td><td class="stable">BLUE +3</td></tr>
+    </tbody>
+  </table>
+
+  <div class="finding">
+    <div class="icon">&#9878;&#65039;</div>
+    <div class="body">
+      <strong>Overall Assessment: Blue Team wins 6&ndash;3, but Red Team scores on the two highest-severity items</strong>
+      <p>The &ldquo;capsule is stable&rdquo; conclusion survives scrutiny &mdash; GM is robustly positive in all configurations and the torus geometry genuinely eliminates the two-stable-point problem. However, the <strong>inverted recovery time</strong> and <strong>flooding scenario</strong> remain open risks that must be closed with model testing and a flooding analysis before CDR. The recommendation to add airbag inflation redundancy is also well-taken.</p>
+    </div>
+  </div>
+
+  <h3>Priority Actions from Red Team Review</h3>
+  <table>
+    <thead><tr><th>#</th><th>Action</th><th>Phase</th><th>Addresses</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><strong>1:10 scale wave-tank test</strong> &mdash; measure actual self-righting time from 180&deg;</td><td>Phase B</td><td>Inverted recovery, validation</td></tr>
+      <tr><td>2</td><td><strong>Flooding stability analysis</strong> &mdash; model partial flooding through failed window or seal</td><td>Phase B</td><td>Hull breach scenario</td></tr>
+      <tr><td>3</td><td><strong>Airbag dual-valve redundancy</strong> &mdash; add independent second inflation path</td><td>CDR</td><td>Airbag single-point failure</td></tr>
+      <tr><td>4</td><td><strong>Eliminate natural list</strong> &mdash; relocate 60 kg safety equipment or add ballast at &theta;=108&deg;</td><td>Phase B</td><td>7&deg; heel, parametric roll</td></tr>
+      <tr><td>5</td><td><strong>Post-crush keel flotation check</strong> &mdash; re-run hydrostatics with half-height keel</td><td>Phase A (1 hour)</td><td>Crushed keel scenario</td></tr>
+    </tbody>
+  </table>
 </section>
 
 <!-- CONCLUSIONS -->
