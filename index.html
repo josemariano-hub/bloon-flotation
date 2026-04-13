@@ -120,7 +120,8 @@
   <a href="#dynamics">Dynamics</a>
   <a href="#viz">3D Renders</a>
   <a href="#orion">vs Orion</a>
-  <a href="#redblue">Red/Blue Team</a>
+  <a href="#inverted">Inverted</a>
+  <a href="#redblue">Red/Blue</a>
   <a href="#conclusions">Conclusions</a>
 </nav>
 
@@ -453,6 +454,93 @@
 
   <h3>Historical Context: Apollo Uprighting</h3>
   <p>The Apollo Command Module (CM) had the same two-stable-point problem. Of 19 ocean splashdowns, <strong>9 (47%) ended in Stable 2</strong> (inverted). Apollo used 3 inflatable bags (&ldquo;uprighting balloons&rdquo;) in the nose section. These were pressurised by the crew manually activating compressors &mdash; a process that took several minutes with the astronauts hanging upside-down in their harnesses, often seasick. The Orion CMUS is the modern evolution of this system, now automatic but still mechanically complex.</p>
+</section>
+
+<!-- DEEP DIVE: INVERTED RECOVERY -->
+<section id="inverted">
+  <h2>Deep Dive: Why Inverted Recovery Is Chaotic</h2>
+  <p>The #1 open risk from the Red Team review. This section explains the physics of what happens when the capsule starts upside-down (180&deg;), and why &ldquo;leaves the inverted position&rdquo; is not the same as &ldquo;self-rights.&rdquo;</p>
+
+  <h3>The Core Problem: Five Phases of Recovery</h3>
+  <div class="img-frame">
+    <img src="flotation_inverted_explained.png" alt="Annotated GZ curve showing chaotic recovery path">
+    <div class="caption"><strong>Figure 5.</strong> Annotated GZ curve with 5-phase recovery timeline. Orange = actual mass distribution. Blue dashed = corrected (thermal+safety moved to axis). Green shading = GZ &gt; 0 (pushes toward upright). Red shading = GZ &lt; 0 (pushes <em>away</em> from upright). The capsule must traverse the ENTIRE curve from 180&deg; back to 0&deg;, passing through wrong-way zones where buoyancy fights the recovery.</div>
+  </div>
+
+  <div class="card">
+    <h3>What happens step by step</h3>
+    <ol style="padding-left:1.4rem; color:var(--text2); font-size:0.92rem;">
+      <li style="margin-bottom:0.8rem">
+        <strong style="color:#e74c3c">Phase 1 &mdash; Slow drift (0&ndash;5 s):</strong>
+        At 180&deg;, the righting arm GZ &asymp; &minus;0.27 m. This IS non-zero &mdash; the capsule IS pushed away from inverted. But the torque is only M&middot;g&middot;GZ = 1401 &times; 9.81 &times; 0.27 = <strong>3,710 N&middot;m</strong>. With I<sub>xx</sub> = 743 kg&middot;m&sup2;, the angular acceleration is &alpha; = 5.0 rad/s&sup2;. However, water resistance (added mass + drag) roughly triples the effective inertia, reducing &alpha; to ~1.7 rad/s&sup2;. <em>It takes approximately 3&ndash;4 seconds just to build up 10&deg;/s of angular velocity.</em> During this time, passengers are hanging upside-down.
+      </li>
+      <li style="margin-bottom:0.8rem">
+        <strong style="color:#f39c12">Phase 2 &mdash; Acceleration (5&ndash;10 s):</strong>
+        As the capsule rolls past 200&deg;, GZ grows more negative (reaching &minus;0.57 m at 210&deg;). This is the <em>steepest part of the GZ curve</em> &mdash; the buoyancy gives a massive angular kick. The capsule accelerates rapidly through 210&deg;&ndash;270&deg;. Angular velocity peaks at 30&ndash;50&deg;/s.
+      </li>
+      <li style="margin-bottom:0.8rem">
+        <strong style="color:#e74c3c">Phase 3 &mdash; Wrong-way zones (10&ndash;17 s):</strong>
+        Between roughly 40&deg; and 130&deg; on the GZ curve, the righting arm is <em>negative</em> &mdash; buoyancy pushes the capsule BACKWARD, away from upright. The capsule ploughs through these zones on angular momentum alone. <strong>This is the root cause of the chaos:</strong> the capsule&rsquo;s speed at entry depends on how much energy it gained in Phase 2, which depends on the exact GZ profile, water conditions, and initial perturbation. Small changes in initial conditions &rarr; large changes in outcome.
+      </li>
+      <li style="margin-bottom:0.8rem">
+        <strong style="color:#f1c40f">Phase 4 &mdash; Overshoot (17&ndash;22 s):</strong>
+        The capsule arrives near 0&deg; (upright) but with significant residual angular velocity. It overshoots past upright, continues to negative heel angles, then swings back. The oscillation amplitude can be &plusmn;30&ndash;60&deg; depending on how much energy was dissipated by water drag.
+      </li>
+      <li style="margin-bottom:0.8rem">
+        <strong style="color:#2ecc71">Phase 5 &mdash; Eventual settling (22&ndash;60+ s):</strong>
+        Water drag slowly dissipates the oscillation energy. The capsule performs damped rocking with decreasing amplitude. It eventually settles near the equilibrium angle (~7&deg; list from mass asymmetry). <em>Total recovery time: 30&ndash;60 seconds in calm water, potentially longer in waves.</em>
+      </li>
+    </ol>
+  </div>
+
+  <h3>The Root Cause: Mass Asymmetry</h3>
+  <div class="img-frame">
+    <img src="flotation_rootcause.png" alt="Root cause comparison: actual vs corrected mass distribution">
+    <div class="caption"><strong>Figure 6.</strong> GZ curve 0&deg;&ndash;180&deg; comparison. Left: actual mass distribution with 245 kg at &theta;=288&deg; (thermal + safety equipment on back wall). Right: corrected, with mass moved to the axis. Both show wrong-way zones (red shading) where GZ &lt; 0, but the corrected case has smaller GZ magnitude at 0&deg; and 180&deg;, reducing the initial offset and overshoot energy. Neither case achieves &ldquo;clean&rdquo; self-righting (GZ &gt; 0 everywhere from 0&deg; to 180&deg;).</div>
+  </div>
+
+  <div class="finding warn">
+    <div class="icon">&#128161;</div>
+    <div class="body">
+      <strong>Key insight: this is a geometry problem, not just a mass problem</strong>
+      <p>Even with perfectly symmetric mass distribution, the GZ curve still shows a negative region around 90&deg; (GZ &asymp; &minus;6 cm). This means the torus shape itself has a mild &ldquo;resistance&rdquo; to passing through the sideways orientation. The mass asymmetry makes it worse (shifting the curve and creating larger wrong-way zones), but eliminating the asymmetry alone does NOT guarantee clean self-righting. The torus geometry, while far superior to a frustum (one stable point vs two), is not inherently self-righting like a weighted keel sailboat.</p>
+    </div>
+  </div>
+
+  <h3>Comparison: What &ldquo;True Self-Righting&rdquo; Looks Like</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h3 style="color:var(--green)">RNLI Self-Righting Lifeboat</h3>
+      <ul style="font-size:0.88rem">
+        <li>GZ &gt; 0 for <strong>all</strong> angles 0&deg;&ndash;180&deg;</li>
+        <li>GZ<sub>max</sub> &asymp; 0.8&ndash;1.2 m at ~90&deg;</li>
+        <li>No wrong-way zones</li>
+        <li>Self-rights from inverted in <strong>&lt; 8 seconds</strong></li>
+        <li>Achieved via: very low, heavy keel + sealed superstructure + buoyant wheelhouse</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--yellow)">BLOON Capsule</h3>
+      <ul style="font-size:0.88rem">
+        <li>GZ &gt; 0 for <strong>~60%</strong> of the 0&deg;&ndash;180&deg; range</li>
+        <li>Wrong-way zone around 40&deg;&ndash;130&deg;</li>
+        <li>Recovery from 180&deg; in <strong>30&ndash;60 seconds</strong> (chaotic)</li>
+        <li>BUT: 180&deg; is NOT a stable equilibrium (unlike Orion)</li>
+        <li>The capsule WILL eventually right itself &mdash; the question is <em>how violently and how long</em></li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>What Would Fix It</h3>
+  <table>
+    <thead><tr><th>Option</th><th>Effect on GZ</th><th>Complexity</th><th>Mass penalty</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Asymmetric airbag inflation</strong> (inflate top bags first when inverted)</td><td>Creates a directed righting moment of ~5000 N&middot;m &mdash; overwhelms wrong-way zones</td><td class="neutral">Medium &mdash; needs orientation sensor + valve sequencing</td><td>~2 kg (sensors + valves)</td></tr>
+      <tr><td><strong>Heavy keel extension</strong> (add 30 kg ballast at keel tip)</td><td>Shifts GZ curve upward by ~4 cm everywhere &mdash; reduces wrong-way zones</td><td class="stable">Low &mdash; passive</td><td>30 kg</td></tr>
+      <tr><td><strong>Relocate thermal+safety mass</strong> (distribute around circumference)</td><td>Reduces CG offset from &minus;0.27 m to ~&minus;0.05 m &mdash; eliminates 7&deg; list and reduces overshoot</td><td class="stable">Low &mdash; layout change only</td><td>0 kg</td></tr>
+      <tr><td><strong>All three combined</strong></td><td>Near-100% GZ positive from 0&deg;&ndash;180&deg;, directed righting from inverted in &lt; 15 s</td><td class="neutral">Medium total</td><td>32 kg</td></tr>
+    </tbody>
+  </table>
 </section>
 
 <!-- RED TEAM / BLUE TEAM -->
