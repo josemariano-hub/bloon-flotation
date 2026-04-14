@@ -772,6 +772,26 @@
     </tbody>
   </table>
 
+  <h3>Orion Model Results: Why 5 Bags Are Needed</h3>
+  <p>The same point-cloud hydrostatics code run on the Orion frustum shape, with CG on-axis (symmetric):</p>
+  <div class="img-frame">
+    <img src="flotation_orion_deepdive.png" alt="Orion GZ deep-dive: two stable equilibria and energy barrier">
+    <div class="caption"><strong>Figure 9.</strong> Top: Symmetric Orion CM showing Stable 1 (upright, 0&deg;) and Stable 2 (inverted, 180&deg;). The yellow hatched region is the energy barrier from Stable 2 to Stable 1: <strong>67,005 J</strong> with peak opposing torque of <strong>54,136 N&middot;m</strong> at 104&deg; heel. Bottom: With CG offset (0.3 m for reentry L/D), equilibria shift but remain strong.</div>
+  </div>
+  <div class="card">
+    <h3>Orion: The Numbers That Force 5 Bags</h3>
+    <table>
+      <tr><td>Stable equilibria (symmetric CG)</td><td class="num">0&deg; (upright) and 180&deg; (inverted)</td></tr>
+      <tr><td>Peak GZ opposing recovery from Stable 2</td><td class="num unstable">+53.1 cm at 104&deg;</td></tr>
+      <tr><td>Peak opposing torque</td><td class="num unstable">54,136 N&middot;m</td></tr>
+      <tr><td>Energy barrier (Stable 2 &rarr; Stable 1)</td><td class="num unstable">67,005 J</td></tr>
+      <tr><td>Required CMUS buoyancy (total, 1.5&times; margin)</td><td class="num">47,841 N (4,877 kgf)</td></tr>
+      <tr><td>Required per bag (5 bags)</td><td class="num">V = 0.95 m&sup3; &rarr; d = 1.22 m each</td></tr>
+      <tr><td>Total CMUS bag volume</td><td class="num">4.76 m&sup3;</td></tr>
+    </table>
+    <p style="font-size:0.88rem;color:var(--text2)">The frustum&rsquo;s GZ at Stable 2 is <strong>comparable in magnitude to Stable 1</strong>. The energy barrier to escape Stable 2 (67 kJ) is 6&times; larger than the barrier to enter it (11.6 kJ). This fundamental asymmetry means massive bags are needed to guarantee recovery. Orion&rsquo;s 5 CMUS bags at 5,000 psi helium are sized to this requirement.</p>
+  </div>
+
   <h3>Historical Context: Apollo Uprighting</h3>
   <p>The Apollo Command Module had the same two-stable-point problem. Of 19 ocean splashdowns, <strong>9 (47%) ended in Stable 2</strong> (inverted). Apollo used 3 inflatable bags pressed into service by the crew manually activating compressors &mdash; hanging upside-down in their harnesses, often seasick. Orion&rsquo;s CMUS is the modern evolution: automatic but mechanically complex (5 bags, 5000 psi COPVs, pyrotechnic valves). BLOON&rsquo;s advantage is that its secondary equilibrium is so weak that a single small sphere suffices.</p>
 </section>
