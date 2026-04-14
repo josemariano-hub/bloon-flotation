@@ -151,13 +151,13 @@
     <div class="icon">&#9989;</div>
     <div class="body"><strong>Airbag deployment triples righting moment</strong><p>The 4.25 m&sup3; inflated torus provides massive waterplane area (I<sub>wp</sub> = 5.07 m&sup4; vs 1.92 m&sup4;), increasing GM from 0.61 m to 2.29 m. Rock-solid stability even in sea state 3 waves.</p></div>
   </div>
-  <div class="finding warn">
+  <div class="finding danger">
     <div class="icon">&#9888;&#65039;</div>
-    <div class="body"><strong>Natural 7&deg; list from subsystem placement</strong><p>Thermal (86 kg) and safety (159 kg) equipment at &theta; = 288&deg; creates a CG Y-offset of &minus;0.27 m. Capsule floats with a persistent 7&deg; heel.</p></div>
+    <div class="body"><strong>CRITICAL: Capsule lists ~44&deg; from mass asymmetry, not 7&deg;</strong><p>The 245 kg concentration at &theta;=288&deg; (thermal + safety) creates a CG Y-offset of &minus;0.27 m. The GZ analysis shows the actual stable equilibrium is at <strong>~44&deg; heel</strong>, not 0&deg;. The keel (51 kg/m&sup3; foam) floats &mdash; it does NOT act as ballast. Redistributing the thermal/safety mass or adding real ballast (~60 kg lead at &theta;=108&deg;) would restore upright flotation.</p></div>
   </div>
   <div class="finding warn">
     <div class="icon">&#9888;&#65039;</div>
-    <div class="body"><strong>Inverted position is unstable but recovery is chaotic</strong><p>The capsule tumbles out of the 180&deg; position but does not cleanly self-right without assistance.</p></div>
+    <div class="body"><strong>BLOON has two stable positions, not one &mdash; but the secondary is weak</strong><p>The GZ curve shows stable equilibria at ~44&deg; and ~162&deg;. A 0.27 m&sup3; sphere (1.8 kg) breaks the weak ~162&deg; equilibrium. Orion needs 5 bags (30&ndash;50 kg) because its Stable 2 is 8&times; stronger.</p></div>
   </div>
 </section>
 
@@ -729,23 +729,51 @@
   </div>
 
   <h3>The Fundamental Difference</h3>
-  <div class="finding">
-    <div class="icon">&#128270;</div>
-    <div class="body">
-      <strong>A cone has two ends &mdash; a torus has none</strong>
-      <p>Orion&rsquo;s frustum shape means it can sit stably on either the wide base (heat shield) or the narrow apex. Both orientations trap water below a convex hull, creating a positive metacentric height. A torus has continuous rotational symmetry about the vertical axis and only one flotation equilibrium because the waterplane second moment of area is always dominated by the large ring diameter, overwhelming any CG offset. The keel further enforces this single equilibrium by concentrating mass at the lowest point.</p>
-    </div>
+  <h3>Rigorous GZ Comparison (Same Code, Both Shapes)</h3>
+  <div class="img-frame">
+    <img src="flotation_orion_vs_bloon.png" alt="GZ curves: Orion vs BLOON computed with identical methodology">
+    <div class="caption"><strong>Figure 8.</strong> GZ righting-arm curves computed with the identical point-cloud methodology applied to both hulls. Top: Orion frustum showing 2 stable equilibria with large GZ amplitude (&plusmn;50 cm). Middle: BLOON torus showing 4 stable equilibria caused by mass asymmetry, with smaller GZ amplitude (&plusmn;27 cm). Dotted = BLOON without keel. Bottom: normalised overlay.</div>
   </div>
-  <div class="finding">
-    <div class="icon">&#128640;</div>
+
+  <div class="finding danger">
+    <div class="icon">&#9888;&#65039;</div>
     <div class="body">
-      <strong>Orion&rsquo;s CMUS adds 5 single-point failure paths. BLOON needs zero.</strong>
-      <p>Each CMUS bag requires a helium COPV, pyrotechnic valve, inflation plumbing, and fabric bladder &mdash; all of which must survive reentry heating, parachute deployment shock, and ocean splashdown impact. The EFT-1 partial failure (3 of 5 bags failed) demonstrates the difficulty. The BLOON capsule&rsquo;s inherent single-stable-point geometry eliminates this entire subsystem, saving mass and removing failure modes.</p>
+      <strong>Correction: BLOON has TWO stable floating positions, not one</strong>
+      <p>The earlier claim that &ldquo;a torus has only one stable equilibrium&rdquo; was wrong. The GZ analysis shows stable equilibria at <strong>~44&deg;</strong> and <strong>~162&deg;</strong>. The 245 kg mass asymmetry (thermal + safety at &theta;=288&deg;) creates a persistent ~44&deg; list, and a secondary near-inverted equilibrium at ~162&deg;. This is not a single-stable-point geometry &mdash; it is a two-stable-point geometry with one WEAK secondary.</p>
     </div>
   </div>
 
+  <div class="finding danger">
+    <div class="icon">&#9888;&#65039;</div>
+    <div class="body">
+      <strong>Correction: The keel does NOT &ldquo;concentrate mass at the lowest point&rdquo;</strong>
+      <p>The Rohacell IG-51 keel has density <strong>51 kg/m&sup3;</strong> &mdash; 20&times; lighter than water. It <em>floats</em>. Its 35.9 kg over 0.703 m&sup3; adds buoyancy below the CG, which actually <strong>lowers the centre of buoyancy and increases BG (mildly destabilising)</strong>. The keel&rsquo;s net effect on the GZ curve is only ~5.4 cm average &mdash; its primary role is energy absorption on landing, not flotation stability.</p>
+    </div>
+  </div>
+
+  <h3>The Honest Comparison</h3>
+  <div class="finding">
+    <div class="icon">&#128270;</div>
+    <div class="body">
+      <strong>The real difference: Orion&rsquo;s inverted equilibrium is STRONG. BLOON&rsquo;s is WEAK.</strong>
+      <p>Orion&rsquo;s frustum creates two robust stable positions with GZ amplitudes of &plusmn;50&ndash;63 cm. The 5-bag CMUS must overcome ~6,500 N&middot;m of righting torque to break out of Stable 2. BLOON&rsquo;s secondary equilibrium at ~162&deg; has GZ amplitude under &plusmn;10 cm &mdash; about 8&times; weaker. A single 0.27 m&sup3; sphere (1.8 kg) can break it. <strong>BLOON needs a sphere. But it&rsquo;s a tiny sphere, not 5 giant bags.</strong></p>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>Property</th><th style="text-align:right">Orion</th><th style="text-align:right">BLOON</th></tr></thead>
+    <tbody>
+      <tr><td>Stable floating positions</td><td class="num unstable">2 (both strong)</td><td class="num neutral">2 (one strong, one weak)</td></tr>
+      <tr><td>Primary equilibrium heel angle</td><td class="num">~218&deg; (with CG offset)</td><td class="num">~44&deg; (with mass asymmetry)</td></tr>
+      <tr><td>Secondary equilibrium GZ amplitude</td><td class="num unstable">&plusmn;50 cm (robust)</td><td class="num stable">&plusmn;10 cm (fragile)</td></tr>
+      <tr><td>Force to break secondary equilibrium</td><td class="num">~6,500 N&middot;m</td><td class="num">~950 N&middot;m</td></tr>
+      <tr><td>Required uprighting system</td><td class="unstable">5 bags, 30&ndash;50 kg, 5000 psi He</td><td class="stable">1 sphere, 1.8 kg, compressed air</td></tr>
+      <tr><td>Keel contribution to stability</td><td>N/A (no keel)</td><td>Minimal (&plusmn;5.4 cm GZ, mostly buoyancy not ballast)</td></tr>
+    </tbody>
+  </table>
+
   <h3>Historical Context: Apollo Uprighting</h3>
-  <p>The Apollo Command Module (CM) had the same two-stable-point problem. Of 19 ocean splashdowns, <strong>9 (47%) ended in Stable 2</strong> (inverted). Apollo used 3 inflatable bags (&ldquo;uprighting balloons&rdquo;) in the nose section. These were pressurised by the crew manually activating compressors &mdash; a process that took several minutes with the astronauts hanging upside-down in their harnesses, often seasick. The Orion CMUS is the modern evolution of this system, now automatic but still mechanically complex.</p>
+  <p>The Apollo Command Module had the same two-stable-point problem. Of 19 ocean splashdowns, <strong>9 (47%) ended in Stable 2</strong> (inverted). Apollo used 3 inflatable bags pressed into service by the crew manually activating compressors &mdash; hanging upside-down in their harnesses, often seasick. Orion&rsquo;s CMUS is the modern evolution: automatic but mechanically complex (5 bags, 5000 psi COPVs, pyrotechnic valves). BLOON&rsquo;s advantage is that its secondary equilibrium is so weak that a single small sphere suffices.</p>
 </section>
 
 <!-- DEEP DIVE: INVERTED RECOVERY -->
