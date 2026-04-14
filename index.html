@@ -222,10 +222,301 @@
       </table>
     </div>
   </div>
-  <div class="img-frame">
-    <img src="flotation_waterlines.png" alt="Cross-section waterline diagrams">
-    <div class="caption"><strong>Figure 1.</strong> Meridional cross-sections with waterline (cyan), CG (red +), and CoB (green triangle). Left: no airbag. Centre: airbag inflated. Right: asymmetric crew loading.</div>
+  <!-- INTERACTIVE CROSS-SECTION -->
+  <h3>Interactive Cross-Section Viewer</h3>
+  <p style="font-size:0.9rem;color:var(--text2)">Select a configuration to see the waterline, CG, CoB, and buoyancy devices. Click any buoy marker for details.</p>
+  <div class="card" id="xsec-card" style="padding:0.8rem 1rem;">
+    <!-- Case selector tabs -->
+    <div id="xsec-tabs" style="display:flex;gap:0.5rem;margin-bottom:0.8rem;flex-wrap:wrap;">
+      <button class="xtab active" data-case="0">No Airbag</button>
+      <button class="xtab" data-case="1">Airbag Inflated</button>
+      <button class="xtab" data-case="2">Asymmetric Crew</button>
+      <button class="xtab" data-case="3">Design 1500 kg</button>
+      <button class="xtab" data-case="4">Airbag + Sphere</button>
+    </div>
+    <!-- SVG viewport -->
+    <svg id="xsec-svg" viewBox="-250 -180 500 420" style="width:100%;max-height:520px;background:#0a0e18;border-radius:8px;cursor:crosshair;"></svg>
+    <!-- Info panel (updates on case change and buoy click) -->
+    <div id="xsec-info" style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.8rem;font-size:0.88rem;">
+      <div id="info-stability" class="card" style="flex:1;min-width:200px;padding:0.8rem;margin:0;"></div>
+      <div id="info-buoy" class="card" style="flex:1;min-width:200px;padding:0.8rem;margin:0;display:none;border-color:var(--accent2);"></div>
+    </div>
   </div>
+  <style>
+    .xtab {
+      background:var(--surface2); color:var(--text2); border:1px solid var(--border);
+      border-radius:6px; padding:0.4rem 1rem; font-size:0.82rem; cursor:pointer;
+      font-weight:600; transition: all 0.2s;
+    }
+    .xtab:hover { border-color:var(--accent); color:var(--text); }
+    .xtab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+    .buoy-marker { cursor:pointer; transition: transform 0.2s; }
+    .buoy-marker:hover { filter: brightness(1.4); }
+  </style>
+  <script>
+  (function(){
+    // ── Case data from hydrostatics ──
+    const CASES = [
+      { label:"No Airbag, Symmetric", mass:1401, GM:0.605, BM:1.415, BG:0.810,
+        Iwp:1.923, Vd:1.359, wl:0.478, cgZ:1.041, cobZ:0.81, airbag:false, sphere:false,
+        gzMax:"+40.1 cm @ 338°", verdict:"STABLE", crew:"Symmetric" },
+      { label:"Airbag Inflated, Symmetric", mass:1401, GM:2.289, BM:3.762, BG:1.473,
+        Iwp:5.073, Vd:1.349, wl:-0.306, cgZ:1.041, cobZ:0.57, airbag:true, sphere:false,
+        gzMax:"+69.6 cm @ 74°", verdict:"VERY STABLE", crew:"Symmetric" },
+      { label:"No Airbag, Asymmetric Crew", mass:1401, GM:0.605, BM:1.415, BG:0.810,
+        Iwp:1.923, Vd:1.359, wl:0.478, cgZ:1.041, cobZ:0.81, airbag:false, sphere:false,
+        gzMax:"+39.4 cm @ 148°", verdict:"STABLE (7° list)", crew:"4 pax clustered +Y" },
+      { label:"Design 1500 kg, No Airbag", mass:1500, GM:0.557, BM:1.351, BG:0.794,
+        Iwp:1.991, Vd:1.474, wl:0.490, cgZ:1.045, cobZ:0.82, airbag:false, sphere:false,
+        gzMax:"+38.9 cm @ 338°", verdict:"STABLE", crew:"Symmetric" },
+      { label:"Airbag + Self-Righting Sphere", mass:1403, GM:2.29, BM:3.76, BG:1.47,
+        Iwp:5.07, Vd:1.35, wl:-0.306, cgZ:1.041, cobZ:0.57, airbag:true, sphere:true,
+        gzMax:"+69.6 cm @ 74°", verdict:"VERY STABLE + SELF-RIGHTING", crew:"Symmetric" },
+    ];
+
+    // ── SVG drawing ──
+    const svg = document.getElementById('xsec-svg');
+    const S = 100; // scale: 100 px per metre
+
+    function px(m){ return m * S; }
+    function zy(z){ return -z * S; } // SVG y is flipped
+
+    function svgEl(tag, attrs){
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for(const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    function drawProfile(g, rArr, zArr, cls, close){
+      let d = "M";
+      for(let i=0;i<rArr.length;i++) d += ` ${px(rArr[i])},${zy(zArr[i])}`;
+      if(close) d += " Z";
+      g.appendChild(svgEl("path", {d, class:cls, fill:close?"rgba(100,140,200,0.08)":"none",
+        stroke:cls==="ext"?"#4f8cff":"#4f8cff", "stroke-width":cls==="ext"?"2":"1",
+        "stroke-dasharray":cls==="int"?"4 3":"none", opacity:cls==="int"?"0.5":"1"}));
+      // Mirror
+      let dm = "M";
+      for(let i=0;i<rArr.length;i++) dm += ` ${px(-rArr[i])},${zy(zArr[i])}`;
+      if(close) dm += " Z";
+      g.appendChild(svgEl("path", {d:dm, fill:close?"rgba(100,140,200,0.08)":"none",
+        stroke:"#4f8cff", "stroke-width":cls==="ext"?"2":"1",
+        "stroke-dasharray":cls==="int"?"4 3":"none", opacity:cls==="int"?"0.5":"1"}));
+    }
+
+    function drawCase(ci){
+      const c = CASES[ci];
+      svg.innerHTML = "";
+      const g = svgEl("g",{});
+
+      // Torus cross-section profile
+      const N = 60;
+      const rExt=[], zExt=[], rInt=[], zInt=[];
+      for(let i=0;i<=N;i++){
+        const phi = -Math.PI/2 + Math.PI*i/N;
+        rExt.push(0.6 + 0.9*Math.cos(phi));
+        zExt.push(1.1 + 0.9*Math.sin(phi));
+        rInt.push(0.6 - 0.475*Math.cos(phi));
+        zInt.push(1.1 + 0.9*Math.sin(phi));
+      }
+      // Filled hull shape (extrados + reversed intrados)
+      let dFill = "M";
+      for(let i=0;i<rExt.length;i++) dFill += ` ${px(rExt[i])},${zy(zExt[i])}`;
+      for(let i=rInt.length-1;i>=0;i--) dFill += ` ${px(rInt[i])},${zy(zInt[i])}`;
+      dFill += " Z";
+      g.appendChild(svgEl("path",{d:dFill, fill:"rgba(100,150,220,0.06)", stroke:"none"}));
+      // Mirror fill
+      let dFillM = "M";
+      for(let i=0;i<rExt.length;i++) dFillM += ` ${px(-rExt[i])},${zy(zExt[i])}`;
+      for(let i=rInt.length-1;i>=0;i--) dFillM += ` ${px(-rInt[i])},${zy(zInt[i])}`;
+      dFillM += " Z";
+      g.appendChild(svgEl("path",{d:dFillM, fill:"rgba(100,150,220,0.06)", stroke:"none"}));
+
+      drawProfile(g, rExt, zExt, "ext", false);
+      drawProfile(g, rInt, zInt, "int", false);
+
+      // Keel
+      const kN = 30, kR=[], kZ=[];
+      for(let i=0;i<=kN;i++){
+        const z = -0.871 + (0.2+0.871)*i/kN;
+        kR.push(0.6*(z+0.871)/(0.2+0.871));
+        kZ.push(z);
+      }
+      let dK="M";for(let i=0;i<kR.length;i++) dK+=` ${px(kR[i])},${zy(kZ[i])}`;
+      g.appendChild(svgEl("path",{d:dK,fill:"none",stroke:"#b8956a","stroke-width":"2"}));
+      let dKm="M";for(let i=0;i<kR.length;i++) dKm+=` ${px(-kR[i])},${zy(kZ[i])}`;
+      g.appendChild(svgEl("path",{d:dKm,fill:"none",stroke:"#b8956a","stroke-width":"2"}));
+      // Keel fill
+      let dKf="M 0,"+zy(-0.871);
+      for(let i=0;i<kR.length;i++) dKf+=` ${px(kR[i])},${zy(kZ[i])}`;
+      dKf+=` ${px(-kR[kR.length-1])},${zy(kZ[kZ.length-1])}`;
+      for(let i=kR.length-1;i>=0;i--) dKf+=` ${px(-kR[i])},${zy(kZ[i])}`;
+      dKf+=" Z";
+      g.appendChild(svgEl("path",{d:dKf,fill:"rgba(184,149,106,0.12)",stroke:"none"}));
+
+      // Airbag
+      if(c.airbag){
+        const aN=40;
+        for(const sign of [1,-1]){
+          let dA="M";
+          for(let i=0;i<=aN;i++){
+            const phi=2*Math.PI*i/aN;
+            const r=1.22+0.42*Math.cos(phi);
+            const z=-0.18+0.42*Math.sin(phi);
+            dA+=` ${px(sign*r)},${zy(z)}`;
+          }
+          dA+=" Z";
+          g.appendChild(svgEl("path",{d:dA,fill:"rgba(238,107,0,0.2)",stroke:"#ee6b00","stroke-width":"2.5"}));
+        }
+        // Clickable airbag marker
+        const abG = svgEl("g",{class:"buoy-marker","data-buoy":"airbag",transform:`translate(${px(1.22)},${zy(-0.18)})`});
+        abG.appendChild(svgEl("circle",{r:"8",fill:"#ee6b00",stroke:"#fff","stroke-width":"1.5"}));
+        abG.appendChild(svgEl("text",{x:"14",y:"4",fill:"#ee6b00","font-size":"10","font-weight":"bold",textContent:""}));
+        abG.textContent=""; // clear
+        const abTxt = svgEl("text",{x:"14",y:"4",fill:"#ee6b00","font-size":"10","font-weight":"bold"});
+        abTxt.textContent = "AIRBAG";
+        abG.appendChild(abTxt);
+        g.appendChild(abG);
+      }
+
+      // Sphere
+      if(c.sphere){
+        const sx=px(0.2), sy=zy(1.1+0.9);
+        const sG = svgEl("g",{class:"buoy-marker","data-buoy":"sphere",transform:`translate(${sx},${sy})`});
+        sG.appendChild(svgEl("circle",{r:px(0.4).toString(),fill:"rgba(255,68,68,0.25)",stroke:"#ff4444","stroke-width":"2"}));
+        sG.appendChild(svgEl("circle",{r:"6",fill:"#ff4444",stroke:"#fff","stroke-width":"1.5"}));
+        const spTxt = svgEl("text",{x:"12",y:"-12",fill:"#ff4444","font-size":"10","font-weight":"bold"});
+        spTxt.textContent = "SPHERE";
+        sG.appendChild(spTxt);
+        g.appendChild(sG);
+      }
+
+      // Water (fill below waterline)
+      const wl = c.wl;
+      g.appendChild(svgEl("rect",{x:"-250",y:zy(wl).toString(),width:"500",
+        height:(420-(-180-(-zy(wl)))).toString(),
+        fill:"rgba(0,180,220,0.07)"}));
+      // Waterline
+      g.appendChild(svgEl("line",{x1:"-240",y1:zy(wl),x2:"240",y2:zy(wl),
+        stroke:"#00e5ff","stroke-width":"2","stroke-dasharray":"8 4"}));
+      const wlTxt = svgEl("text",{x:"-238",y:zy(wl)-6,fill:"#00e5ff","font-size":"11","font-weight":"bold"});
+      wlTxt.textContent = `WL = ${wl>=0?"+":""}${wl.toFixed(2)} m`;
+      g.appendChild(wlTxt);
+
+      // CG marker
+      const cgY = zy(c.cgZ);
+      g.appendChild(svgEl("line",{x1:"-8",y1:cgY-8,x2:"8",y2:cgY+8,stroke:"#ff4444","stroke-width":"3"}));
+      g.appendChild(svgEl("line",{x1:"-8",y1:cgY+8,x2:"8",y2:cgY-8,stroke:"#ff4444","stroke-width":"3"}));
+      const cgTxt = svgEl("text",{x:"14",y:cgY+4,fill:"#ff4444","font-size":"11","font-weight":"bold"});
+      cgTxt.textContent = `CG ${c.cgZ.toFixed(2)} m`;
+      g.appendChild(cgTxt);
+
+      // CoB marker (triangle)
+      const cobY = zy(c.cobZ);
+      g.appendChild(svgEl("polygon",{points:`0,${cobY-8} -7,${cobY+6} 7,${cobY+6}`,
+        fill:"#2ecc71",stroke:"#fff","stroke-width":"1"}));
+      const cobTxt = svgEl("text",{x:"14",y:cobY+4,fill:"#2ecc71","font-size":"11","font-weight":"bold"});
+      cobTxt.textContent = `CoB ${c.cobZ.toFixed(2)} m`;
+      g.appendChild(cobTxt);
+
+      // Scale bar
+      g.appendChild(svgEl("line",{x1:px(-1.5),y1:zy(-1.2),x2:px(-0.5),y2:zy(-1.2),
+        stroke:"#666","stroke-width":"1"}));
+      const scTxt = svgEl("text",{x:px(-1.2),y:zy(-1.2)-6,fill:"#666","font-size":"9","text-anchor":"middle"});
+      scTxt.textContent = "1 m";
+      g.appendChild(scTxt);
+
+      svg.appendChild(g);
+
+      // Update info panel
+      const si = document.getElementById('info-stability');
+      si.innerHTML = `
+        <h3 style="margin:0 0 0.5rem;font-size:1rem;color:${c.GM>1.5?'var(--green)':c.GM>0.3?'var(--accent)':'var(--yellow)'}">${c.verdict}</h3>
+        <table style="margin:0;font-size:0.85rem;">
+          <tr><td>Configuration</td><td style="text-align:right;font-weight:600">${c.label}</td></tr>
+          <tr><td>Mass</td><td class="num">${c.mass} kg</td></tr>
+          <tr><td>Crew</td><td style="text-align:right">${c.crew}</td></tr>
+          <tr><td>GM (metacentric height)</td><td class="num" style="color:var(--green);font-weight:700">${c.GM>0?"+":""}${c.GM.toFixed(3)} m</td></tr>
+          <tr><td>BM</td><td class="num">${c.BM.toFixed(3)} m</td></tr>
+          <tr><td>BG</td><td class="num">${c.BG.toFixed(3)} m</td></tr>
+          <tr><td>I<sub>wp</sub></td><td class="num">${c.Iwp.toFixed(3)} m&sup4;</td></tr>
+          <tr><td>V<sub>displaced</sub></td><td class="num">${c.Vd.toFixed(3)} m&sup3;</td></tr>
+          <tr><td>Waterline Z</td><td class="num">${c.wl>=0?"+":""}${c.wl.toFixed(3)} m</td></tr>
+          <tr><td>GZ<sub>max</sub></td><td class="num">${c.gzMax}</td></tr>
+        </table>`;
+
+      // Hide buoy panel initially
+      document.getElementById('info-buoy').style.display = 'none';
+    }
+
+    // Buoy detail data
+    const BUOYS = {
+      airbag: {
+        title: "Landing Airbag Torus",
+        color: "#ee6b00",
+        rows: [
+          ["Type", "Single-chamber inflatable torus"],
+          ["R<sub>major</sub>", "1,220 mm"],
+          ["R<sub>minor</sub>", "420 mm"],
+          ["Volume", "4.25 m\u00b3 (4,250 litres)"],
+          ["Buoyancy (submerged)", "42,700 N (4,353 kgf)"],
+          ["Shell mass", "6.2 kg (Vectran/Kevlar)"],
+          ["I<sub>wp</sub> contribution", "+3.15 m\u2074"],
+          ["GM improvement", "+1.68 m (from 0.61 to 2.29)"],
+          ["Primary function", "Landing energy absorption (crush stroke 420 mm)"],
+          ["Flotation function", "Massive waterplane area \u2192 3.8\u00d7 stability gain"],
+          ["Colour", "RAL 2004 Pure Orange"],
+          ["Inflation", "Pre-inflated before descent"],
+        ]
+      },
+      sphere: {
+        title: "Self-Righting Sphere",
+        color: "#ff4444",
+        rows: [
+          ["Type", "Inflatable sphere on capsule roof"],
+          ["Diameter", "800 mm"],
+          ["Volume", "0.268 m\u00b3 (268 litres)"],
+          ["Buoyancy (submerged)", "2,696 N (275 kgf)"],
+          ["Righting torque at 170\u00b0", "952 N\u00b7m"],
+          ["Energy injection", "1,730 J (2\u00d7 wrong-way barrier)"],
+          ["Shell mass", "1.8 kg (Vectran/nylon)"],
+          ["Mounting", "Roof cavity, 200 mm off-axis"],
+          ["Inflation", "Compressed air, auto on water contact"],
+          ["Stowed size", "300 \u00d7 200 \u00d7 80 mm"],
+          ["Function", "Accelerates departure from inverted; bridges wrong-way GZ zones"],
+          ["Colour", "RAL 3024 Luminous Red"],
+        ]
+      }
+    };
+
+    // Click handlers
+    svg.addEventListener('click', function(e){
+      const marker = e.target.closest('.buoy-marker');
+      if(!marker) { document.getElementById('info-buoy').style.display='none'; return; }
+      const key = marker.getAttribute('data-buoy');
+      const b = BUOYS[key]; if(!b) return;
+      const panel = document.getElementById('info-buoy');
+      panel.style.display = 'block';
+      panel.style.borderColor = b.color;
+      let html = `<h3 style="margin:0 0 0.5rem;color:${b.color}">${b.title}</h3>`;
+      html += '<table style="margin:0;font-size:0.85rem;">';
+      for(const [k,v] of b.rows) html += `<tr><td>${k}</td><td style="text-align:right">${v}</td></tr>`;
+      html += '</table>';
+      panel.innerHTML = html;
+    });
+
+    // Tab handlers
+    document.querySelectorAll('.xtab').forEach(btn => {
+      btn.addEventListener('click', function(){
+        document.querySelectorAll('.xtab').forEach(b=>b.classList.remove('active'));
+        this.classList.add('active');
+        drawCase(parseInt(this.getAttribute('data-case')));
+      });
+    });
+
+    // Initial draw
+    drawCase(0);
+  })();
+  </script>
 </section>
 
 <!-- MASS -->
